@@ -1,59 +1,85 @@
-<x-layouts::auth>
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mabuhay Hardware - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gray-100">
 
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
+<div class="w-full max-w-5xl bg-white shadow-lg rounded-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+
+    <!-- Left Branding Section -->
+    <div class="bg-green-700 text-white flex items-center justify-center p-10">
+        <div>
+            <h1 class="text-4xl font-bold tracking-wide">MABUHAY</h1>
+            <h1 class="text-4xl font-bold tracking-wide">HARDWARE</h1>
+            <p class="mt-4 text-sm opacity-80">
+                Inventory & Management System
+            </p>
+        </div>
+    </div>
+
+    <!-- Right Login Section -->
+    <div class="p-10 ">
+        <div class="mb-6 flex flex-col items-center">
+        <h2 class="text-2xl font-semibold mb-1 text-center">Log in to your account</h2>
+        <h3 class="text-xs text-center mb-6">Welcome back! Please enter your details.</h3>
+            
+        </div>
+        
+
+        @if (session('status'))
+            <div class="mb-4 text-green-600 text-sm">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('login.store') }}">
             @csrf
 
-            <!-- Email Address -->
-            <flux:input
-                name="email"
-                :label="__('Email address')"
-                :value="old('email')"
-                type="email"
-                required
-                autofocus
-                autocomplete="email"
-                placeholder="email@example.com"
-            />
+            <!-- Username / Email -->
+            <div class="mb-4">
+                <label class="block text-sm mb-1">Email</label>
+                <input type="email"
+                       name="email"
+                       required
+                       autofocus
+                       class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+            </div>
 
             <!-- Password -->
-            <div class="relative">
-                <flux:input
-                    name="password"
-                    :label="__('Password')"
-                    type="password"
-                    required
-                    autocomplete="current-password"
-                    :placeholder="__('Password')"
-                    viewable
-                />
-
-                @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                        {{ __('Forgot your password?') }}
-                    </flux:link>
-                @endif
+            <div class="mb-4">
+                <label class="block text-sm mb-1">Password</label>
+                <input type="password"
+                       name="password"
+                       required
+                       class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
             </div>
 
             <!-- Remember Me -->
-            <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
+            <div class="flex items-center justify-center mb-6">
 
-            <div class="flex items-center justify-end">
-                <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                    {{ __('Log in') }}
-                </flux:button>
+                @if (Route::has('password.request'))
+                    <a href="{{ route('password.request') }}"
+                       class="text-sm text-green-700 hover:underline">
+                        Forgot password?
+                    </a>
+                @endif
             </div>
+
+            <!-- Login Button -->
+            <button type="submit"
+                    class="w-full bg-green-700 text-white py-2 rounded-lg hover:bg-green-800 transition">
+                Sign in
+            </button>
+
         </form>
-
-        @if (Route::has('register'))
-            <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
-                <span>{{ __('Don\'t have an account?') }}</span>
-                <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
-            </div>
-        @endif
     </div>
-</x-layouts::auth>
+
+</div>
+
+</body>
+</html>
