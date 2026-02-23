@@ -1,12 +1,34 @@
-<x-layouts::app :title="__('User Management')">
-    <div class="space-y-6">
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+    <head>
+        @include('partials.head')
+    </head>
+    <body class="min-h-screen bg-white dark:bg-zinc-800">
+        <div class="mx-auto w-full max-w-7xl space-y-6 p-4 md:p-6">
         <div class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
             <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <h2 class="text-xl font-bold text-zinc-800 dark:text-zinc-100">Staff Management</h2>
                 <div class="flex items-center gap-3">
-                    <div class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                    </div>
+                    <flux:dropdown position="bottom" align="end">
+                        <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </button>
+
+                        <flux:menu>
+                            <div class="px-3 py-2 text-sm text-zinc-600 dark:text-zinc-300">
+                                {{ auth()->user()->name }}
+                            </div>
+
+                            <flux:menu.separator />
+
+                            <form method="POST" action="{{ route('admin.logout') }}" class="w-full">
+                                @csrf
+                                <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full cursor-pointer text-start" data-test="admin-logout-button">
+                                    {{ __('Log Out') }}
+                                </flux:menu.item>
+                            </form>
+                        </flux:menu>
+                    </flux:dropdown>
                 </div>
             </div>
         </div>
@@ -82,5 +104,8 @@
                 </section>
             </div>
         </div>
-    </div>
-</x-layouts::app>
+        </div>
+
+        @fluxScripts
+    </body>
+</html>
