@@ -23,7 +23,24 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
+
+    // Helper methods for quick role checks
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isCashier(): bool
+    {
+        return $this->role === 'cashier';
+    }
+
+    public function isInventoryManager(): bool
+    {
+        return $this->role === 'inventory_manager';
+    }
 
     /**
      * The attributes that should be hidden for serialization.
