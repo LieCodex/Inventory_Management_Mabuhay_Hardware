@@ -9,7 +9,7 @@
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
                 <flux:sidebar.collapse class="lg:hidden" />
             </flux:sidebar.header>
-
+@if(auth()->user()->isInventoryManager())
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Mabuhay Hardware')" class="grid">
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
@@ -29,7 +29,17 @@
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
+@endif
+@if(auth()->user()->isCashier())
+            <flux:sidebar.nav>
+                <flux:sidebar.group :heading="__('Mabuhay Hardware')" class="grid">
+                    <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+                        {{ __('Dashboard') }}
+                    </flux:sidebar.item>
 
+                </flux:sidebar.group>
+            </flux:sidebar.nav>
+@endif
             <flux:spacer />
 
             <flux:sidebar.nav>
