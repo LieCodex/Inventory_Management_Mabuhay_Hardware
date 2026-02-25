@@ -13,6 +13,7 @@ class UserSeeder extends Seeder
         // Create Admin
         User::create([
             'name' => 'System Admin',
+            'username' => 'admin',
             'email' => 'admin@mabuhay.com',
             'password' => Hash::make('password123'),
             'role' => 'admin',
@@ -21,6 +22,7 @@ class UserSeeder extends Seeder
         // Create Cashier
         User::create([
             'name' => 'John Cashier',
+            'username' => 'cashier',
             'email' => 'cashier@mabuhay.com',
             'password' => Hash::make('password123'),
             'role' => 'cashier',
@@ -29,6 +31,7 @@ class UserSeeder extends Seeder
         // Create Inventory Manager
         User::create([
             'name' => 'Sarah Manager',
+            'username' => 'manager',
             'email' => 'manager@mabuhay.com',
             'password' => Hash::make('password123'),
             'role' => 'inventory_manager',
