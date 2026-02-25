@@ -33,10 +33,25 @@ Route::get('/dashboard', function (Request $request) {
     };
 })->middleware(['auth'])->name('dashboard');
 
+//Inventory Manager routes
 Route::view('/inventory-manager/dashboard', 'inventory_manager.dashboard')
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.dashboard');
 
+Route::view('/inventory-manager/inventory', 'inventory_manager.inventory')
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.inventory');
+
+Route::view('/inventory-manager/reports', 'inventory_manager.reports')
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.reports');
+
+Route::view('/inventory-manager/suppliers', 'inventory_manager.suppliers')
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.suppliers');
+
+
+// Cashier routes
 Route::view('/cashier/dashboard', 'cashier.dashboard')
     ->middleware(['auth', 'role:cashier'])
     ->name('cashier.dashboard');

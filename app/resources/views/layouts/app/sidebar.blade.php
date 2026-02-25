@@ -12,19 +12,19 @@
 @if(auth()->user()->isInventoryManager())
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Mabuhay Hardware')" class="grid">
-                    <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+                    <flux:sidebar.item icon="home" :href="route('inventory_manager.dashboard')" :current="request()->routeIs('inventory_manager.dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="archive-box" href="#">
+                    <flux:sidebar.item icon="archive-box" :href="route('inventory_manager.inventory')" :current="request()->routeIs('inventory_manager.inventory')" wire:navigate>
                         {{ __('Inventory') }}
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="chart-bar" href="#">
+                    <flux:sidebar.item icon="chart-bar" :href="route('inventory_manager.reports')" :current="request()->routeIs('inventory_manager.reports')" wire:navigate>
                         {{ __('Reports') }}
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="truck" href="#">
+                    <flux:sidebar.item icon="truck" :href="route('inventory_manager.suppliers')" :current="request()->routeIs('inventory_manager.suppliers')" wire:navigate>
                         {{ __('Suppliers') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
