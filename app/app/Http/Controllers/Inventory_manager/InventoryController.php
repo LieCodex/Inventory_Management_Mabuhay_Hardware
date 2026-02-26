@@ -5,26 +5,49 @@ namespace App\Http\Controllers\Inventory_manager;
 use App\Http\Controllers\Controller;
 use App\Models\Item;
 use App\Models\InventoryBatch;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
 {
-    // This loads the Inventory page and passes the database items to it
     public function index()
-    {
-        // Get all items, paginated by 10 per page. 
-        // We use 'with' to eagerly load the earliest expiry date from the batches table.
-        $items = Item::with(['inventoryBatches' => function ($query) {
-            $query->orderBy('expiry_date', 'asc');
-        }])->paginate(10);
-        
-        // Calculate Stats for the top cards
-        $totalProducts = Item::sum('quantity_on_hand');
-        $lowStocks = Item::whereColumn('quantity_on_hand', '<=', 'low_stock_threshold')->count();
-        $outOfStock = Item::where('quantity_on_hand', 0)->count();
+        {
+            // Get paginated items with their expiry dates
+            $items = Item::with(['inventoryBatches' => function ($query) {
+                $query->orderBy('expiry_date', 'asc');
+            }])->paginate(10);
+            
+            // 1. Category Count
+            $categoryCount = Item::whereNotNull('category')->distinct('category')->count('category');
 
-        return view('inventory_manager.inventory', compact('items', 'totalProducts', 'lowStocks', 'outOfStock'));
-    }
+            // 2. Total Items & 7-Day Revenue
+            $totalProducts = Item::sum('quantity_on_hand');
+            $revenue7Days = DB::table('transactions')
+                ->where('created_at', '>=', now()->subDays(7))
+                ->sum('total_amount') ?? 0;
+
+            // 3. Items Sold & 7-Day Cost
+            $topSelling = DB::table('transaction_items')
+                ->where('created_at', '>=', now()->subDays(7))
+                ->sum('quantity') ?? 0;
+                
+            $cost7Days = DB::table('transaction_items')
+                ->join('inventory_batches', 'transaction_items.batch_id', '=', 'inventory_batches.id')
+                ->where('transaction_items.created_at', '>=', now()->subDays(7))
+                ->sum(DB::raw('transaction_items.quantity * inventory_batches.price')) ?? 0;
+
+            // 4. Low Stock & Out of Stock
+            $lowStocks = Item::where('quantity_on_hand', '>', 0)
+                ->whereColumn('quantity_on_hand', '<=', 'low_stock_threshold')
+                ->count();
+                
+            $outOfStock = Item::where('quantity_on_hand', 0)->count();
+
+            return view('inventory_manager.inventory', compact(
+                'items', 'categoryCount', 'totalProducts', 'revenue7Days', 
+                'topSelling', 'cost7Days', 'lowStocks', 'outOfStock'
+            ));
+        }
 
     // This handles the "Add Product" Modal submission
     public function store(Request $request)

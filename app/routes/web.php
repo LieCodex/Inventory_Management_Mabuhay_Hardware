@@ -2,9 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Inventory_manager\InventoryController;
 use App\Http\Controllers\Inventory_manager\SupplierController;
+use App\Http\Controllers\Inventory_manager\InvManagerDashboardController;
 use Illuminate\Http\Request;
 
 Route::redirect('/', '/dashboard')->name('home');
@@ -18,9 +19,9 @@ Route::prefix('admin')->group(function () {
 // Admin Protected Routes
 Route::middleware(['auth', \App\Http\Middleware\EnsureUserIsAdmin::class])->prefix('admin')->group(function () {
     // Dashboard & User Management
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    Route::post('/users', [DashboardController::class, 'storeUser'])->name('admin.users.store');
-    Route::delete('/users/{user}', [DashboardController::class, 'destroyUser'])->name('admin.users.destroy');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::post('/users', [AdminDashboardController::class, 'storeUser'])->name('admin.users.store');
+    Route::delete('/users/{user}', [AdminDashboardController::class, 'destroyUser'])->name('admin.users.destroy');
     
     // Auth
     Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
@@ -36,7 +37,7 @@ Route::get('/dashboard', function (Request $request) {
 })->middleware(['auth'])->name('dashboard');
 
 // Inventory Manager routes
-Route::view('/inventory-manager/dashboard', 'inventory_manager.dashboard')
+Route::get('/inventory-manager/dashboard', [InvManagerDashboardController::class, 'index'])
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.dashboard');
 

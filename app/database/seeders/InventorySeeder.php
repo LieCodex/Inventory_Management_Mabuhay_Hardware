@@ -9,9 +9,10 @@ class InventorySeeder extends Seeder
 {
     public function run(): void
     {
-        $items = [
+    $items = [
             [
                 'name' => 'Screw', 
+                'category' => 'Small Items',
                 'sku' => 'SCR-001', 
                 'unit_of_measure' => 'pcs', 
                 'price_per_unit' => 430, 
@@ -20,6 +21,7 @@ class InventorySeeder extends Seeder
             ],
             [
                 'name' => 'Hammer', 
+                'category' => 'Hand Tools',
                 'sku' => 'HAM-001', 
                 'unit_of_measure' => 'pcs', 
                 'price_per_unit' => 257, 
@@ -28,6 +30,7 @@ class InventorySeeder extends Seeder
             ],
             [
                 'name' => 'Pliers', 
+                'category' => 'Hand Tools',
                 'sku' => 'PLI-001', 
                 'unit_of_measure' => 'pcs', 
                 'price_per_unit' => 405, 
@@ -36,13 +39,14 @@ class InventorySeeder extends Seeder
             ],
             [
                 'name' => 'Welding Machine', 
+                'category' => 'Power Tools',
                 'sku' => 'WEL-001', 
                 'unit_of_measure' => 'pcs', 
                 'price_per_unit' => 502, 
                 'quantity_on_hand' => 14, 
                 'low_stock_threshold' => 6
             ]
-        ];
+            ];
 
         foreach ($items as $item) {
             Item::create($item);

@@ -23,53 +23,59 @@
             </div>
         </div>
 
-        <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+<section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
             <h2 class="mb-4 text-lg font-semibold text-zinc-800 dark:text-zinc-100">Overall Inventory</h2>
             
-            <div class="grid grid-cols-2 gap-6 md:grid-cols-4 md:divide-x md:divide-zinc-200 dark:md:divide-zinc-700">
-                <div class="flex flex-col space-y-2 md:pl-0">
-                    <p class="text-sm font-medium text-sky-500">Categories</p>
-                    <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">14</p>
-                    <p class="text-xs text-zinc-500">Last 7 days</p>
+            <div class="grid grid-cols-2 gap-y-6 md:grid-cols-4 md:divide-x md:divide-zinc-200 dark:md:divide-zinc-700">
+                <div class="flex flex-col md:px-6 md:first:pl-0 md:last:pr-0">
+                    <p class="mb-2 text-sm font-medium text-sky-500">Categories</p>
+                    <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">{{ $categoryCount }}</p>
+                    <p class="mt-1 text-xs text-zinc-500">All time</p>
                 </div>
                 
-                <div class="flex flex-col space-y-2 md:pl-6">
-                    <p class="text-sm font-medium text-amber-500">Total Items</p>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">{{ $totalProducts ?? 0 }}</p>
-                        <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">₱25000</p>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-zinc-500">Last 7 days</p>
-                        <p class="text-xs text-zinc-500">Revenue</p>
-                    </div>
-                </div>
-
-                <div class="flex flex-col space-y-2 md:pl-6">
-                    <p class="text-sm font-medium text-indigo-500">Top Selling</p>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">5</p>
-                        <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">₱2500</p>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-zinc-500">Last 7 days</p>
-                        <p class="text-xs text-zinc-500">Cost</p>
+                <div class="flex flex-col md:px-6">
+                    <p class="mb-2 text-sm font-medium text-amber-500">Total Items</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">{{ number_format($totalProducts) }}</p>
+                            <p class="mt-1 text-xs text-zinc-500">In Stock</p>
+                        </div>
+                        <div>
+                            <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">₱ {{ number_format($revenue7Days, 2) }}</p>
+                            <p class="mt-1 text-xs text-zinc-500">7-Day Revenue</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col space-y-2 md:pl-6">
-                    <p class="text-sm font-medium text-rose-500">Low Stocks</p>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">{{ $lowStocks ?? 0 }}</p>
-                        <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">{{ $outOfStock ?? 0 }}</p>
+                <div class="flex flex-col md:px-6">
+                    <p class="mb-2 text-sm font-medium text-indigo-500">Items Sold</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">{{ number_format($topSelling) }}</p>
+                            <p class="mt-1 text-xs text-zinc-500">Last 7 days</p>
+                        </div>
+                        <div>
+                            <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">₱ {{ number_format($cost7Days, 2) }}</p>
+                            <p class="mt-1 text-xs text-zinc-500">7-Day Cost</p>
+                        </div>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-zinc-500">Low Stock</p>
-                        <p class="text-xs text-zinc-500">Not in stock</p>
+                </div>
+
+                <div class="flex flex-col md:px-6">
+                    <p class="mb-2 text-sm font-medium text-rose-500">Low Stocks</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">{{ $lowStocks }}</p>
+                            <p class="mt-1 text-xs text-zinc-500">Low Stock</p>
+                        </div>
+                        <div>
+                            <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">{{ $outOfStock }}</p>
+                            <p class="mt-1 text-xs text-zinc-500">Not in stock</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </section>s
 
         <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
             <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
