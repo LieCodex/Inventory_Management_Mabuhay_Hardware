@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Inventory_manager\InventoryController;
 use Illuminate\Http\Request;
 
 Route::redirect('/', '/dashboard')->name('home');
@@ -33,14 +34,18 @@ Route::get('/dashboard', function (Request $request) {
     };
 })->middleware(['auth'])->name('dashboard');
 
-//Inventory Manager routes
+// Inventory Manager routes
 Route::view('/inventory-manager/dashboard', 'inventory_manager.dashboard')
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.dashboard');
 
-Route::view('/inventory-manager/inventory', 'inventory_manager.inventory')
+Route::get('/inventory-manager/inventory', [InventoryController::class, 'index'])
     ->middleware(['auth', 'role:inventory_manager'])
-    ->name('inventory_manager.inventory');
+    ->name('inventory_manager.inventory'); 
+
+Route::post('/inventory-manager/inventory', [InventoryController::class, 'store'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory.store'); 
 
 Route::view('/inventory-manager/reports', 'inventory_manager.reports')
     ->middleware(['auth', 'role:inventory_manager'])
@@ -50,6 +55,8 @@ Route::view('/inventory-manager/suppliers', 'inventory_manager.suppliers')
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.suppliers');
 
+Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
 
 // Cashier routes
 Route::view('/cashier/dashboard', 'cashier.dashboard')

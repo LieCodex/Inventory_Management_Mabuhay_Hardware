@@ -1,11 +1,12 @@
 <x-layouts::app :title="__('Suppliers')">
     <div class="space-y-6" x-data="{ showAddSupplierModal: false }">
+        
         <div class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
             <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div class="w-full max-w-xl">
                     <input
                         type="text"
-                        placeholder="Search product, supplier, order"
+                        placeholder="Search item, supplier, order"
                         class="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm outline-none ring-emerald-500 placeholder:text-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                     >
                 </div>
@@ -45,7 +46,7 @@
                     <thead class="text-zinc-500">
                         <tr>
                             <th class="py-3 font-medium">Supplier Company</th>
-                            <th class="py-3 font-medium">Product</th>
+                            <th class="py-3 font-medium">Item</th>
                             <th class="py-3 font-medium">Contact Number</th>
                             <th class="py-3 font-medium">Email</th>
                             <th class="py-3 text-center font-medium">On the way</th>
@@ -139,5 +140,97 @@
                 </button>
             </div>
         </section>
+
+        <div 
+            x-show="showAddSupplierModal" 
+            style="display: none;"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/50 p-4 backdrop-blur-sm"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+        >
+            <div 
+                @click.away="showAddSupplierModal = false"
+                class="w-full max-w-lg rounded-xl border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+            >
+                <h3 class="mb-6 text-lg font-semibold text-zinc-800 dark:text-zinc-100">New Supplier</h3>
+
+                <form class="space-y-5">
+                    <div class="mb-6 flex items-center justify-center gap-4 sm:justify-start sm:pl-[33%]">
+                        <div class="flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed border-zinc-300 bg-zinc-50 text-zinc-400 dark:border-zinc-600 dark:bg-zinc-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                            </svg>
+                        </div>
+                        <div class="text-sm">
+                            <p class="text-zinc-600 dark:text-zinc-400">Drag image here</p>
+                            <p class="text-xs text-zinc-500">or</p>
+                            <button type="button" class="text-emerald-600 hover:underline dark:text-emerald-400">Browse image</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Supplier Name</label>
+                        <input type="text" placeholder="Enter supplier name" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                    </div>
+                    
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Item</label>
+                        <input type="text" placeholder="Enter item" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                    </div>
+
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Category</label>
+                        <select class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500 outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+                            <option>Select item category</option>
+                            <option>Materials</option>
+                            <option>Power Tools</option>
+                            <option>Small Items</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Buying Price</label>
+                        <input type="text" placeholder="Enter buying price" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                    </div>
+
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Contact Number</label>
+                        <input type="text" placeholder="Enter supplier contact number" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                    </div>
+
+                    <div class="grid grid-cols-3 items-start gap-4">
+                        <label class="pt-2 text-sm text-zinc-600 dark:text-zinc-400">Type</label>
+                        <div class="col-span-2 flex flex-col gap-3 sm:flex-row">
+                            <label class="flex cursor-pointer items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:has-[:checked]:border-emerald-500 dark:has-[:checked]:bg-emerald-900/20 dark:has-[:checked]:text-emerald-400">
+                                <input type="radio" name="return_type" value="not_taking" class="peer hidden" checked>
+                                <span>Not taking return</span>
+                            </label>
+                            
+                            <label class="flex cursor-pointer items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:has-[:checked]:border-emerald-500 dark:has-[:checked]:bg-emerald-900/20 dark:has-[:checked]:text-emerald-400">
+                                <input type="radio" name="return_type" value="taking" class="peer hidden">
+                                <span>Taking return</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-end gap-3 pt-4">
+                        <button type="button" @click="showAddSupplierModal = false" class="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">
+                            Discard
+                        </button>
+                        <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700">
+                            Add Supplier
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
     </div>
 </x-layouts::app>

@@ -5,7 +5,7 @@
                 <div class="w-full max-w-xl">
                     <input
                         type="text"
-                        placeholder="Search product, supplier, order"
+                        placeholder="Search item, supplier, order"
                         class="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm outline-none ring-emerald-500 placeholder:text-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800"
                     >
                 </div>
@@ -101,7 +101,7 @@
                 </section>
 
                 <section class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
-                    <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Product Summary</h2>
+                    <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Item Summary</h2>
                     <div class="mt-4 grid gap-3 sm:grid-cols-2">
                         <div class="rounded-lg bg-zinc-50 p-3 dark:bg-zinc-800"><p class="text-xs text-zinc-500">Number of Suppliers</p><p class="mt-1 text-xl font-semibold">31</p></div>
                         <div class="rounded-lg bg-zinc-50 p-3 dark:bg-zinc-800"><p class="text-xs text-zinc-500">Number of Categories</p><p class="mt-1 text-xl font-semibold">21</p></div>
