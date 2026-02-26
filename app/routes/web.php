@@ -58,6 +58,10 @@ Route::view('/inventory-manager/suppliers', 'inventory_manager.suppliers')
 Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
 Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
 
+Route::get('/inventory-manager/inventory/{item}', [InventoryController::class, 'show'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory.show');
+
 // Cashier routes
 Route::view('/cashier/dashboard', 'cashier.dashboard')
     ->middleware(['auth', 'role:cashier'])

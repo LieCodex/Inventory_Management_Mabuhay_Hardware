@@ -101,36 +101,39 @@
                             <th class="py-3 font-medium">Availability</th>
                         </tr>
                     </thead>
-                    <tbody class="text-zinc-700 dark:text-zinc-200">
-                        @forelse($items as $item)
-                            <tr class="border-t border-zinc-200 dark:border-zinc-700">
-                                <td class="py-3">{{ $item->name }}</td>
-                                <td class="py-3">₱ {{ number_format($item->price_per_unit, 2) }}</td>
-                                <td class="py-3">{{ $item->quantity_on_hand }} {{ $item->unit_of_measure }}</td>
-                                <td class="py-3">{{ $item->low_stock_threshold }} {{ $item->unit_of_measure }}</td>
-                                <td class="py-3">
-                                    @if($item->inventoryBatches->isNotEmpty() && $item->inventoryBatches->first()->expiry_date)
-                                        {{ \Carbon\Carbon::parse($item->inventoryBatches->first()->expiry_date)->format('d/m/y') }}
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
-                                <td class="py-3">
-                                    @if($item->quantity_on_hand == 0)
-                                        <span class="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">Out of stock</span>
-                                    @elseif($item->quantity_on_hand <= $item->low_stock_threshold)
-                                        <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Low stock</span>
-                                    @else
-                                        <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">In-stock</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="py-6 text-center text-zinc-500">No products found in inventory.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
+                        <tbody class="text-zinc-700 dark:text-zinc-200">
+                            @forelse($items as $item)
+                                <tr 
+                                    onclick="window.location='{{ route('inventory.show', $item->id) }}'" 
+                                    class="border-t border-zinc-200 cursor-pointer transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800/50"
+                                >
+                                    <td class="py-3 font-medium text-zinc-900 dark:text-zinc-100">{{ $item->name }}</td>
+                                    <td class="py-3">₱ {{ number_format($item->price_per_unit, 2) }}</td>
+                                    <td class="py-3">{{ $item->quantity_on_hand }} {{ $item->unit_of_measure }}</td>
+                                    <td class="py-3">{{ $item->low_stock_threshold }} {{ $item->unit_of_measure }}</td>
+                                    <td class="py-3">
+                                        @if($item->inventoryBatches->isNotEmpty() && $item->inventoryBatches->first()->expiry_date)
+                                            {{ \Carbon\Carbon::parse($item->inventoryBatches->first()->expiry_date)->format('d/m/y') }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    <td class="py-3">
+                                        @if($item->quantity_on_hand == 0)
+                                            <span class="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">Out of stock</span>
+                                        @elseif($item->quantity_on_hand <= $item->low_stock_threshold)
+                                            <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Low stock</span>
+                                        @else
+                                            <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">In-stock</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="py-6 text-center text-zinc-500">No products found in inventory.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
                 </table>
             </div>
 

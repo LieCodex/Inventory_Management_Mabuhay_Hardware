@@ -56,4 +56,15 @@ class InventoryController extends Controller
         // 4. Send them back to the inventory page
         return redirect()->route('inventory.index')->with('success', 'Item added successfully!');
     }
+
+    // loads the individual item details page
+    public function show(Item $item)
+    {
+        // Eager load batches to get the expiry date
+        $item->load(['inventoryBatches' => function ($query) {
+            $query->orderBy('expiry_date', 'asc');
+        }]);
+
+        return view('inventory_manager.item_details', compact('item'));
+    }
 }
