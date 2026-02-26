@@ -53,80 +53,24 @@
                             <th class="py-3 text-right font-medium leading-tight">Expected Date<br>of Arrival</th>
                         </tr>
                     </thead>
-                    <tbody class="text-zinc-700 dark:text-zinc-200">
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Richard Martin</td>
-                            <td class="py-4">Screws</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">richard@gmail.com</td>
-                            <td class="py-4 text-center">100</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Tom Homan</td>
-                            <td class="py-4">Nails</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">tomhoman@gmail.com</td>
-                            <td class="py-4 text-center">-</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Veandir</td>
-                            <td class="py-4">Bolts</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">veandier@gmail.com</td>
-                            <td class="py-4 text-center">-</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Charin</td>
-                            <td class="py-4">Anchors</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">charin@gmail.com</td>
-                            <td class="py-4 text-center">12</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Hoffman</td>
-                            <td class="py-4">Hinges</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">hoffman@gmail.com</td>
-                            <td class="py-4 text-center">-</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Fainden Juke</td>
-                            <td class="py-4">Door handles</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">fainden@gmail.com</td>
-                            <td class="py-4 text-center">9</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Martin</td>
-                            <td class="py-4">Padlocks & hasps</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">martin@gmail.com</td>
-                            <td class="py-4 text-center">-</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Joe Nike</td>
-                            <td class="py-4">Brackets</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">joenike@gmail.com</td>
-                            <td class="py-4 text-center">-</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Dender Luke</td>
-                            <td class="py-4">Hammers</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">dender@gmail.com</td>
-                            <td class="py-4 text-center">7</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                    </tbody>
+                        <tbody class="text-zinc-700 dark:text-zinc-200">
+                            @forelse($suppliers as $supplier)
+                                <tr class="border-t border-zinc-100 dark:border-zinc-800">
+                                    <td class="py-4 font-medium">{{ $supplier->company_name }}</td>
+                                    <td class="py-4">{{ $supplier->item ? $supplier->item->name : 'N/A' }}</td>
+                                    <td class="py-4">{{ $supplier->contact_number }}</td>
+                                    <td class="py-4">{{ $supplier->email ?? 'No email' }}</td>
+                                    <td class="py-4 text-center">{{ $supplier->quantity_on_the_way > 0 ? $supplier->quantity_on_the_way : '-' }}</td>
+                                    <td class="py-4 text-right">
+                                        {{ $supplier->eta ? \Carbon\Carbon::parse($supplier->eta)->format('d/m/y') : 'N/A' }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="py-6 text-center text-zinc-500">No suppliers found. Add one to get started!</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
                 </table>
             </div>
 
@@ -161,63 +105,35 @@
             >
                 <h3 class="mb-6 text-lg font-semibold text-zinc-800 dark:text-zinc-100">New Supplier</h3>
 
-                <form class="space-y-5">
-                    <div class="mb-6 flex items-center justify-center gap-4 sm:justify-start sm:pl-[33%]">
-                        <div class="flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed border-zinc-300 bg-zinc-50 text-zinc-400 dark:border-zinc-600 dark:bg-zinc-800">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                            </svg>
-                        </div>
-                        <div class="text-sm">
-                            <p class="text-zinc-600 dark:text-zinc-400">Drag image here</p>
-                            <p class="text-xs text-zinc-500">or</p>
-                            <button type="button" class="text-emerald-600 hover:underline dark:text-emerald-400">Browse image</button>
-                        </div>
-                    </div>
-
+                <form action="{{ route('inventory_manager.suppliers.store') }}" method="POST" class="space-y-5">
+                    @csrf
+                    
                     <div class="grid grid-cols-3 items-center gap-4">
-                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Supplier Name</label>
-                        <input type="text" placeholder="Enter supplier name" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Company Name</label>
+                        <input type="text" name="company_name" required placeholder="Enter company name" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
                     </div>
                     
                     <div class="grid grid-cols-3 items-center gap-4">
-                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Item</label>
-                        <input type="text" placeholder="Enter item" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
-                    </div>
-
-                    <div class="grid grid-cols-3 items-center gap-4">
-                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Category</label>
-                        <select class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500 outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
-                            <option>Select item category</option>
-                            <option>Materials</option>
-                            <option>Power Tools</option>
-                            <option>Small Items</option>
-                        </select>
-                    </div>
-
-                    <div class="grid grid-cols-3 items-center gap-4">
-                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Buying Price</label>
-                        <input type="text" placeholder="Enter buying price" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Supplied Item</label>
+                            <select name="item_id" required class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500 outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+                                <option value="">Select product...</option>
+                                
+                                @forelse($items as $item)
+                                    <option value="{{ $item->id }}">{{ $item->name }} ({{ $item->sku }})</option>
+                                @empty
+                                    <option value="" disabled>⚠️ No products found! Add items in Inventory first.</option>
+                                @endforelse
+                            </select>
                     </div>
 
                     <div class="grid grid-cols-3 items-center gap-4">
                         <label class="text-sm text-zinc-600 dark:text-zinc-400">Contact Number</label>
-                        <input type="text" placeholder="Enter supplier contact number" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                        <input type="text" name="contact_number" required placeholder="Enter contact number" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
                     </div>
 
-                    <div class="grid grid-cols-3 items-start gap-4">
-                        <label class="pt-2 text-sm text-zinc-600 dark:text-zinc-400">Type</label>
-                        <div class="col-span-2 flex flex-col gap-3 sm:flex-row">
-                            <label class="flex cursor-pointer items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:has-[:checked]:border-emerald-500 dark:has-[:checked]:bg-emerald-900/20 dark:has-[:checked]:text-emerald-400">
-                                <input type="radio" name="return_type" value="not_taking" class="peer hidden" checked>
-                                <span>Not taking return</span>
-                            </label>
-                            
-                            <label class="flex cursor-pointer items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:has-[:checked]:border-emerald-500 dark:has-[:checked]:bg-emerald-900/20 dark:has-[:checked]:text-emerald-400">
-                                <input type="radio" name="return_type" value="taking" class="peer hidden">
-                                <span>Taking return</span>
-                            </label>
-                        </div>
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Email Address</label>
+                        <input type="email" name="email" placeholder="Optional" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
                     </div>
 
                     <div class="mt-8 flex justify-end gap-3 pt-4">
