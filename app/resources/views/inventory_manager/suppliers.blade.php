@@ -55,7 +55,10 @@
                     </thead>
                         <tbody class="text-zinc-700 dark:text-zinc-200">
                             @forelse($suppliers as $supplier)
-                                <tr class="border-t border-zinc-100 dark:border-zinc-800">
+                                <tr 
+                                    onclick="window.location='{{ route('inventory_manager.suppliers.show', $supplier->id) }}'" 
+                                    class="border-t border-zinc-100 cursor-pointer transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50"
+                                >
                                     <td class="py-4 font-medium">{{ $supplier->company_name }}</td>
                                     <td class="py-4">{{ $supplier->item ? $supplier->item->name : 'N/A' }}</td>
                                     <td class="py-4">{{ $supplier->contact_number }}</td>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Inventory_manager\InventoryController;
 use App\Http\Controllers\Inventory_manager\SupplierController;
 use App\Http\Controllers\Inventory_manager\InvManagerDashboardController;
+use App\Http\Controllers\Inventory_manager\ReportController;
 use Illuminate\Http\Request;
 
 Route::redirect('/', '/dashboard')->name('home');
@@ -64,15 +65,21 @@ Route::get('/inventory-manager/inventory/{item}', [InventoryController::class, '
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory.show');
 
-// Replaces the old static view with our new dynamic Controller
 Route::get('/inventory-manager/suppliers', [SupplierController::class, 'index'])
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.suppliers');
 
-// Handles the form submission
 Route::post('/inventory-manager/suppliers', [SupplierController::class, 'store'])
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.suppliers.store');
+
+Route::get('/inventory-manager/suppliers/{supplier}', [SupplierController::class, 'show'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.suppliers.show');
+
+Route::get('/inventory-manager/reports', [ReportController::class, 'index'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.reports');
 
 
 // Cashier routes

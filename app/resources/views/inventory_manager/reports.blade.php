@@ -5,7 +5,7 @@
                 <div class="w-full max-w-xl">
                     <input
                         type="text"
-                        placeholder="Search product, supplier, order"
+                        placeholder="Search item, supplier, order"
                         class="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm outline-none ring-emerald-500 placeholder:text-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                     >
                 </div>
@@ -23,40 +23,39 @@
         </div>
 
         <div class="grid gap-6 lg:grid-cols-3">
-            
             <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900 lg:col-span-2">
                 <h2 class="mb-6 text-lg font-semibold text-zinc-800 dark:text-zinc-100">Overview</h2>
                 
                 <div class="grid grid-cols-3 gap-6 border-b border-zinc-200 pb-6 dark:border-zinc-800">
                     <div class="space-y-1">
-                        <p class="text-xl font-semibold text-zinc-800 dark:text-zinc-100">₱21,190</p>
-                        <p class="text-sm text-zinc-500">Total Profit</p>
+                        <p class="text-xl font-semibold text-emerald-500 dark:text-emerald-500">₱{{ number_format($profit, 2) }}</p>
+                        <p class="text-sm text-emerald-500">Total Profit</p>
                     </div>
                     <div class="space-y-1">
-                        <p class="text-xl font-semibold text-amber-500">₱18,300</p>
+                        <p class="text-xl font-semibold text-amber-500">₱{{ number_format($revenue, 2) }}</p>
                         <p class="text-sm text-amber-500/80">Revenue</p>
                     </div>
                     <div class="space-y-1">
-                        <p class="text-xl font-semibold text-sky-500">₱17,432</p>
-                        <p class="text-sm text-sky-500/80">Sales</p>
+                        <p class="text-xl font-semibold text-sky-500">₱{{ number_format($cost, 2) }}</p>
+                        <p class="text-sm text-sky-500/80">Cost of Goods</p> 
                     </div>
                 </div>
 
                 <div class="mt-6 grid grid-cols-4 gap-6">
                     <div class="space-y-1">
-                        <p class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">₱1,17,432</p>
+                        <p class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">₱{{ number_format($netPurchaseValue, 2) }}</p>
                         <p class="text-xs text-zinc-500">Net purchase value</p>
                     </div>
                     <div class="space-y-1">
-                        <p class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">₱80,432</p>
+                        <p class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">₱{{ number_format($netSalesValue, 2) }}</p>
                         <p class="text-xs text-zinc-500">Net sales value</p>
                     </div>
                     <div class="space-y-1">
-                        <p class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">₱30,432</p>
+                        <p class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">₱{{ number_format($momProfit, 2) }}</p>
                         <p class="text-xs text-zinc-500">MoM Profit</p>
                     </div>
                     <div class="space-y-1">
-                        <p class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">₱1,10,432</p>
+                        <p class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">₱{{ number_format($yoyProfit, 2) }}</p>
                         <p class="text-xs text-zinc-500">YoY Profit</p>
                     </div>
                 </div>
@@ -73,29 +72,66 @@
                         <tr>
                             <th class="pb-3 font-medium">Category</th>
                             <th class="pb-3 font-medium">Turn Over</th>
-                            <th class="pb-3 text-right font-medium">Increase By</th>
+                            <th class="pb-3 text-right font-medium">Trend</th>
                         </tr>
                     </thead>
                     <tbody class="text-zinc-700 dark:text-zinc-200">
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-3">Small Items</td>
-                            <td class="py-3">₱26,000</td>
-                            <td class="py-3 text-right text-emerald-500">3.2%</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-3">Power Tools</td>
-                            <td class="py-3">₱22,000</td>
-                            <td class="py-3 text-right text-emerald-500">2%</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-3">Materials</td>
-                            <td class="py-3">₱22,000</td>
-                            <td class="py-3 text-right text-emerald-500">1.5%</td>
-                        </tr>
+                        @forelse($bestCategories as $category)
+                            <tr class="border-t border-zinc-100 dark:border-zinc-800">
+                                <td class="py-3">{{ $category->category }}</td>
+                                <td class="py-3">₱{{ number_format($category->turnover, 2) }}</td>
+                                <td class="py-3 text-right text-emerald-500">--</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="py-4 text-center text-zinc-500">No sales data yet.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </section>
+        </div>
 
+        <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+            </section>
+
+        <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+            <div class="mb-6 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Best selling product</h2>
+                <a href="{{ route('inventory.index') }}" class="text-sm font-medium text-sky-500 hover:text-sky-400">See All</a>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="text-zinc-500">
+                        <tr>
+                            <th class="pb-3 font-medium">Product</th>
+                            <th class="pb-3 font-medium">Product ID</th>
+                            <th class="pb-3 font-medium">Category</th>
+                            <th class="pb-3 font-medium">Remaining Quantity</th>
+                            <th class="pb-3 font-medium">Turn Over</th>
+                            <th class="pb-3 text-right font-medium">Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-zinc-700 dark:text-zinc-200">
+                        @forelse($bestProducts as $product)
+                            <tr class="border-t border-zinc-100 dark:border-zinc-800">
+                                <td class="py-4 font-medium">{{ $product->item->name ?? 'Unknown' }}</td>
+                                <td class="py-4">{{ $product->item->sku ?? 'N/A' }}</td>
+                                <td class="py-4">{{ $product->item->category ?? 'N/A' }}</td>
+                                <td class="py-4">{{ $product->item->quantity_on_hand ?? 0 }} {{ $product->item->unit_of_measure ?? '' }}</td>
+                                <td class="py-4">₱{{ number_format($product->turnover, 2) }}</td>
+                                <td class="py-4 text-right text-emerald-500">--</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="py-6 text-center text-zinc-500">No sales data available yet to determine best sellers.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
         </div>
 
         <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
@@ -158,62 +194,6 @@
                 <span class="flex items-center gap-2">
                     <span class="h-3 w-3 rounded-full bg-amber-400"></span> Profit
                 </span>
-            </div>
-        </section>
-
-        <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-            <div class="mb-6 flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Best selling product</h2>
-                <a href="#" class="text-sm font-medium text-sky-500 hover:text-sky-400">See All</a>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead class="text-zinc-500">
-                        <tr>
-                            <th class="pb-3 font-medium">Product</th>
-                            <th class="pb-3 font-medium">Product ID</th>
-                            <th class="pb-3 font-medium">Category</th>
-                            <th class="pb-3 font-medium">Remaining Quantity</th>
-                            <th class="pb-3 font-medium">Turn Over</th>
-                            <th class="pb-3 text-right font-medium">Increase By</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-zinc-700 dark:text-zinc-200">
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Portland Cement</td>
-                            <td class="py-4">23567</td>
-                            <td class="py-4">Materials</td>
-                            <td class="py-4">225 Bags</td>
-                            <td class="py-4">₱17,000</td>
-                            <td class="py-4 text-right text-emerald-500">2.3%</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Power Drill</td>
-                            <td class="py-4">25831</td>
-                            <td class="py-4">Power Tools</td>
-                            <td class="py-4">20 pcs</td>
-                            <td class="py-4">₱12,000</td>
-                            <td class="py-4 text-right text-emerald-500">1.3%</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Assorted Nails</td>
-                            <td class="py-4">56841</td>
-                            <td class="py-4">Small Items</td>
-                            <td class="py-4">200 Boxes</td>
-                            <td class="py-4">₱10,000</td>
-                            <td class="py-4 text-right text-emerald-500">1.3%</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Marine Plywood</td>
-                            <td class="py-4">23567</td>
-                            <td class="py-4">Materials</td>
-                            <td class="py-4">125 Sheets</td>
-                            <td class="py-4">₱9,000</td>
-                            <td class="py-4 text-right text-emerald-500">1%</td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </section>
 

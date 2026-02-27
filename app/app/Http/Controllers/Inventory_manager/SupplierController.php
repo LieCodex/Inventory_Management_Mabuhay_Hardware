@@ -35,4 +35,11 @@ class SupplierController extends Controller
 
         return redirect()->route('inventory_manager.suppliers')->with('success', 'Supplier added successfully!');
     }
+
+    public function show(SupplierInfo $supplier)
+    {
+        $supplier->load('item');
+
+        return view('inventory_manager.supplier_details', compact('supplier'));
+    }
 }
