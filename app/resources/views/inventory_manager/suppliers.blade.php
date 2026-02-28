@@ -6,7 +6,7 @@
                 <div class="w-full max-w-xl">
                     <input
                         type="text"
-                        placeholder="Search item, supplier, order"
+                        placeholder="Search item, supplier, deliveries"
                         class="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm outline-none ring-emerald-500 placeholder:text-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                     >
                 </div>
@@ -78,13 +78,27 @@
             </div>
 
             <div class="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4 dark:border-zinc-800">
-                <button class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
-                    Previous
-                </button>
-                <span class="text-sm text-zinc-500">Page 1 of 10</span>
-                <button class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
-                    Next
-                </button>
+                @if ($suppliers->onFirstPage())
+                    <button disabled class="cursor-not-allowed opacity-50 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                        Previous
+                    </button>
+                @else
+                    <a href="{{ $suppliers->previousPageUrl() }}" class="inline-block rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
+                        Previous
+                    </a>
+                @endif
+
+                <span class="text-sm text-zinc-500">Page {{ $suppliers->currentPage() }} of {{ max(1, $suppliers->lastPage()) }}</span>
+
+                @if ($suppliers->hasMorePages())
+                    <a href="{{ $suppliers->nextPageUrl() }}" class="inline-block rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
+                        Next
+                    </a>
+                @else
+                    <button disabled class="cursor-not-allowed opacity-50 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                        Next
+                    </button>
+                @endif
             </div>
         </section>
 

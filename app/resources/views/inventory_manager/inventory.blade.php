@@ -6,7 +6,7 @@
                 <div class="w-full max-w-xl">
                     <input
                         type="text"
-                        placeholder="Search item, supplier, order"
+                        placeholder="Search item, supplier, deliveries"
                         class="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm outline-none ring-emerald-500 placeholder:text-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800"
                     >
                 </div>
@@ -23,7 +23,7 @@
             </div>
         </div>
 
-<section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+        <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
             <h2 class="mb-4 text-lg font-semibold text-zinc-800 dark:text-zinc-100">Overall Inventory</h2>
             
             <div class="grid grid-cols-2 gap-y-6 md:grid-cols-4 md:divide-x md:divide-zinc-200 dark:md:divide-zinc-700">
@@ -75,7 +75,7 @@
                     </div>
                 </div>
             </div>
-        </section>s
+        </section>
 
         <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
             <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -144,9 +144,29 @@
             </div>
 
             <div class="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4 dark:border-zinc-800">
-                @if(isset($items) && $items->hasPages())
-                    {{ $items->links() }}
+                
+                @if ($items->onFirstPage())
+                    <button disabled class="cursor-not-allowed opacity-50 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                        Previous
+                    </button>
+                @else
+                    <a href="{{ $items->previousPageUrl() }}" class="inline-block rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
+                        Previous
+                    </a>
                 @endif
+
+                <span class="text-sm text-zinc-500">Page {{ $items->currentPage() }} of {{ max(1, $items->lastPage()) }}</span>
+
+                @if ($items->hasMorePages())
+                    <a href="{{ $items->nextPageUrl() }}" class="inline-block rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
+                        Next
+                    </a>
+                @else
+                    <button disabled class="cursor-not-allowed opacity-50 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                        Next
+                    </button>
+                @endif
+                
             </div>
         </section>
 

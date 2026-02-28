@@ -1,5 +1,5 @@
 <x-layouts::app :title="$supplier->company_name . ' - Details'">
-    <div class="space-y-6">
+    <div class="space-y-6" x-data="{ activeTab: new URLSearchParams(location.search).has('page') ? 'deliveries' : 'overview' }">
         
         <div class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
             <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -47,12 +47,28 @@
             </div>
 
             <div class="mb-8 flex space-x-8 border-b border-zinc-200 dark:border-zinc-800">
-                <button class="border-b-2 border-emerald-500 pb-4 text-sm font-medium text-emerald-600 dark:text-emerald-400">Overview</button>
-                <button class="border-b-2 border-transparent pb-4 text-sm font-medium text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">Deliveries</button>
-                <button class="border-b-2 border-transparent pb-4 text-sm font-medium text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">Logs</button>
+                <button @click="activeTab = 'overview'" 
+                        :class="activeTab === 'overview' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'" 
+                        class="border-b-2 pb-4 text-sm font-medium transition-colors">
+                    Overview
+                </button>
+                <button @click="activeTab = 'deliveries'" 
+                        :class="activeTab === 'deliveries' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'" 
+                        class="border-b-2 pb-4 text-sm font-medium transition-colors">
+                    Deliveries
+                </button>
+                <button @click="activeTab = 'logs'" 
+                        :class="activeTab === 'logs' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'" 
+                        class="border-b-2 pb-4 text-sm font-medium transition-colors">
+                    Logs
+                </button>
             </div>
 
-            <div class="grid gap-12 lg:grid-cols-2">
+            <div x-show="activeTab === 'overview'" 
+                 x-transition:enter="transition ease-out duration-200" 
+                 x-transition:enter-start="opacity-0 translate-y-2" 
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 class="grid gap-12 lg:grid-cols-2">
                 
                 <div class="space-y-8">
                     <div>
@@ -124,8 +140,80 @@
                         </div>
                     </div>
                 </div>
-
             </div>
+
+            <div x-show="activeTab === 'deliveries'" style="display: none;" 
+                 x-transition:enter="transition ease-out duration-200" 
+                 x-transition:enter-start="opacity-0 translate-y-2" 
+                 x-transition:enter-end="opacity-100 translate-y-0">
+                
+                <h3 class="mb-4 text-lg font-semibold text-zinc-800 dark:text-zinc-100">Delivery History</h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-zinc-500 border-b border-zinc-200 dark:border-zinc-800">
+                            <tr>
+                                <th class="py-3 font-medium">Date Received</th>
+                                <th class="py-3 font-medium">Logistics Company</th>
+                                <th class="py-3 font-medium">Quantity</th>
+                                <th class="py-3 font-medium">Unit Cost</th>
+                                <th class="py-3 font-medium text-right">Total Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-zinc-700 dark:text-zinc-200 divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                            @forelse($deliveries as $delivery)
+                                <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                                    <td class="py-3">{{ \Carbon\Carbon::parse($delivery->delivery_date)->format('M d, Y') }}</td>
+                                    <td class="py-3">{{ $delivery->logistic_company }}</td>
+                                    <td class="py-3">{{ $delivery->quantity }}</td>
+                                    <td class="py-3">₱{{ number_format($delivery->unit_cost, 2) }}</td>
+                                    <td class="py-3 text-right font-medium">₱{{ number_format($delivery->quantity * $delivery->unit_cost, 2) }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="py-6 text-center text-zinc-500">No past deliveries found for this supplier.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4 dark:border-zinc-800">
+                    
+                    @if ($deliveries->onFirstPage())
+                        <button disabled class="cursor-not-allowed opacity-50 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                            Previous
+                        </button>
+                    @else
+                        <a href="{{ $deliveries->previousPageUrl() }}" class="inline-block rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
+                            Previous
+                        </a>
+                    @endif
+
+                    <span class="text-sm text-zinc-500">Page {{ $deliveries->currentPage() }} of {{ max(1, $deliveries->lastPage()) }}</span>
+
+                    @if ($deliveries->hasMorePages())
+                        <a href="{{ $deliveries->nextPageUrl() }}" class="inline-block rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
+                            Next
+                        </a>
+                    @else
+                        <button disabled class="cursor-not-allowed opacity-50 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                            Next
+                        </button>
+                    @endif
+                    
+                </div>
+            </div>
+
+            <div x-show="activeTab === 'logs'" style="display: none;" 
+                 x-transition:enter="transition ease-out duration-200" 
+                 x-transition:enter-start="opacity-0 translate-y-2" 
+                 x-transition:enter-end="opacity-100 translate-y-0">
+                <div class="flex h-40 items-center justify-center rounded-lg border-2 border-dashed border-zinc-200 dark:border-zinc-800">
+                    <p class="text-sm text-zinc-500">No logs generated yet.</p>
+                </div>
+            </div>
+
         </div>
     </div>
 </x-layouts::app>

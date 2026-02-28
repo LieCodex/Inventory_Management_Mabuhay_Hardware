@@ -6,7 +6,7 @@
                 <div class="w-full max-w-xl">
                     <input
                         type="text"
-                        placeholder="Search item, supplier, order"
+                        placeholder="Search item, supplier, deliveries"
                         class="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm outline-none ring-emerald-500 placeholder:text-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                     >
                 </div>

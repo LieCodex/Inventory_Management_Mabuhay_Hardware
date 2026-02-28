@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SupplierInfo;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; 
 
 class SupplierController extends Controller
 {
@@ -40,6 +41,16 @@ class SupplierController extends Controller
     {
         $supplier->load('item');
 
-        return view('inventory_manager.supplier_details', compact('supplier'));
+        // Fetch paginated delivery history for this specific supplier
+        $deliveries = DB::table('logistic_items')
+            ->join('logistic_logs', 'logistic_items.logs_id', '=', 'logistic_logs.id')
+            ->where('logistic_items.item_id', $supplier->item_id)
+            ->select('logistic_items.*', 'logistic_logs.date as delivery_date', 'logistic_logs.logistic_company')
+            ->orderByDesc('logistic_logs.date')
+            ->paginate(10); // Show 5 deliveries per page
+
+        return view('inventory_manager.supplier_details', compact('supplier', 'deliveries'));
     }
+
+    
 }
