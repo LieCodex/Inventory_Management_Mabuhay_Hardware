@@ -2,7 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Inventory_manager\InventoryController;
+use App\Http\Controllers\Inventory_manager\SupplierController;
+use App\Http\Controllers\Inventory_manager\InvManagerDashboardController;
+use App\Http\Controllers\Inventory_manager\ReportController;
 use Illuminate\Http\Request;
 
 Route::redirect('/', '/dashboard')->name('home');
@@ -16,9 +20,9 @@ Route::prefix('admin')->group(function () {
 // Admin Protected Routes
 Route::middleware(['auth', \App\Http\Middleware\EnsureUserIsAdmin::class])->prefix('admin')->group(function () {
     // Dashboard & User Management
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    Route::post('/users', [DashboardController::class, 'storeUser'])->name('admin.users.store');
-    Route::delete('/users/{user}', [DashboardController::class, 'destroyUser'])->name('admin.users.destroy');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::post('/users', [AdminDashboardController::class, 'storeUser'])->name('admin.users.store');
+    Route::delete('/users/{user}', [AdminDashboardController::class, 'destroyUser'])->name('admin.users.destroy');
     
     // Auth
     Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
@@ -33,14 +37,18 @@ Route::get('/dashboard', function (Request $request) {
     };
 })->middleware(['auth'])->name('dashboard');
 
-//Inventory Manager routes
-Route::view('/inventory-manager/dashboard', 'inventory_manager.dashboard')
+// Inventory Manager routes
+Route::get('/inventory-manager/dashboard', [InvManagerDashboardController::class, 'index'])
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.dashboard');
 
-Route::view('/inventory-manager/inventory', 'inventory_manager.inventory')
+Route::get('/inventory-manager/inventory', [InventoryController::class, 'index'])
     ->middleware(['auth', 'role:inventory_manager'])
-    ->name('inventory_manager.inventory');
+    ->name('inventory_manager.inventory'); 
+
+Route::post('/inventory-manager/inventory', [InventoryController::class, 'store'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory.store'); 
 
 Route::view('/inventory-manager/reports', 'inventory_manager.reports')
     ->middleware(['auth', 'role:inventory_manager'])
@@ -49,6 +57,29 @@ Route::view('/inventory-manager/reports', 'inventory_manager.reports')
 Route::view('/inventory-manager/suppliers', 'inventory_manager.suppliers')
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.suppliers');
+
+Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
+
+Route::get('/inventory-manager/inventory/{item}', [InventoryController::class, 'show'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory.show');
+
+Route::get('/inventory-manager/suppliers', [SupplierController::class, 'index'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.suppliers');
+
+Route::post('/inventory-manager/suppliers', [SupplierController::class, 'store'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.suppliers.store');
+
+Route::get('/inventory-manager/suppliers/{supplier}', [SupplierController::class, 'show'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.suppliers.show');
+
+Route::get('/inventory-manager/reports', [ReportController::class, 'index'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.reports');
 
 
 // Cashier routes

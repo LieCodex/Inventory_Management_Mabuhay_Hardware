@@ -1,11 +1,12 @@
 <x-layouts::app :title="__('Suppliers')">
     <div class="space-y-6" x-data="{ showAddSupplierModal: false }">
+        
         <div class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
             <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div class="w-full max-w-xl">
                     <input
                         type="text"
-                        placeholder="Search product, supplier, order"
+                        placeholder="Search item, supplier, deliveries"
                         class="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm outline-none ring-emerald-500 placeholder:text-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                     >
                 </div>
@@ -45,99 +46,124 @@
                     <thead class="text-zinc-500">
                         <tr>
                             <th class="py-3 font-medium">Supplier Company</th>
-                            <th class="py-3 font-medium">Product</th>
+                            <th class="py-3 font-medium">Item</th>
                             <th class="py-3 font-medium">Contact Number</th>
                             <th class="py-3 font-medium">Email</th>
                             <th class="py-3 text-center font-medium">On the way</th>
                             <th class="py-3 text-right font-medium leading-tight">Expected Date<br>of Arrival</th>
                         </tr>
                     </thead>
-                    <tbody class="text-zinc-700 dark:text-zinc-200">
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Richard Martin</td>
-                            <td class="py-4">Screws</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">richard@gmail.com</td>
-                            <td class="py-4 text-center">100</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Tom Homan</td>
-                            <td class="py-4">Nails</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">tomhoman@gmail.com</td>
-                            <td class="py-4 text-center">-</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Veandir</td>
-                            <td class="py-4">Bolts</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">veandier@gmail.com</td>
-                            <td class="py-4 text-center">-</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Charin</td>
-                            <td class="py-4">Anchors</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">charin@gmail.com</td>
-                            <td class="py-4 text-center">12</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Hoffman</td>
-                            <td class="py-4">Hinges</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">hoffman@gmail.com</td>
-                            <td class="py-4 text-center">-</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Fainden Juke</td>
-                            <td class="py-4">Door handles</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">fainden@gmail.com</td>
-                            <td class="py-4 text-center">9</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Martin</td>
-                            <td class="py-4">Padlocks & hasps</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">martin@gmail.com</td>
-                            <td class="py-4 text-center">-</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Joe Nike</td>
-                            <td class="py-4">Brackets</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">joenike@gmail.com</td>
-                            <td class="py-4 text-center">-</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                        <tr class="border-t border-zinc-100 dark:border-zinc-800">
-                            <td class="py-4">Dender Luke</td>
-                            <td class="py-4">Hammers</td>
-                            <td class="py-4">09123456789</td>
-                            <td class="py-4">dender@gmail.com</td>
-                            <td class="py-4 text-center">7</td>
-                            <td class="py-4 text-right">10/12/25</td>
-                        </tr>
-                    </tbody>
+                        <tbody class="text-zinc-700 dark:text-zinc-200">
+                            @forelse($suppliers as $supplier)
+                                <tr 
+                                    onclick="window.location='{{ route('inventory_manager.suppliers.show', $supplier->id) }}'" 
+                                    class="border-t border-zinc-100 cursor-pointer transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50"
+                                >
+                                    <td class="py-4 font-medium">{{ $supplier->company_name }}</td>
+                                    <td class="py-4">{{ $supplier->item ? $supplier->item->name : 'N/A' }}</td>
+                                    <td class="py-4">{{ $supplier->contact_number }}</td>
+                                    <td class="py-4">{{ $supplier->email ?? 'No email' }}</td>
+                                    <td class="py-4 text-center">{{ $supplier->quantity_on_the_way > 0 ? $supplier->quantity_on_the_way : '-' }}</td>
+                                    <td class="py-4 text-right">
+                                        {{ $supplier->eta ? \Carbon\Carbon::parse($supplier->eta)->format('d/m/y') : 'N/A' }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="py-6 text-center text-zinc-500">No suppliers found. Add one to get started!</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
                 </table>
             </div>
 
             <div class="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4 dark:border-zinc-800">
-                <button class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
-                    Previous
-                </button>
-                <span class="text-sm text-zinc-500">Page 1 of 10</span>
-                <button class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
-                    Next
-                </button>
+                @if ($suppliers->onFirstPage())
+                    <button disabled class="cursor-not-allowed opacity-50 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                        Previous
+                    </button>
+                @else
+                    <a href="{{ $suppliers->previousPageUrl() }}" class="inline-block rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
+                        Previous
+                    </a>
+                @endif
+
+                <span class="text-sm text-zinc-500">Page {{ $suppliers->currentPage() }} of {{ max(1, $suppliers->lastPage()) }}</span>
+
+                @if ($suppliers->hasMorePages())
+                    <a href="{{ $suppliers->nextPageUrl() }}" class="inline-block rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
+                        Next
+                    </a>
+                @else
+                    <button disabled class="cursor-not-allowed opacity-50 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                        Next
+                    </button>
+                @endif
             </div>
         </section>
+
+        <div 
+            x-show="showAddSupplierModal" 
+            style="display: none;"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/50 p-4 backdrop-blur-sm"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+        >
+            <div 
+                @click.away="showAddSupplierModal = false"
+                class="w-full max-w-lg rounded-xl border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+            >
+                <h3 class="mb-6 text-lg font-semibold text-zinc-800 dark:text-zinc-100">New Supplier</h3>
+
+                <form action="{{ route('inventory_manager.suppliers.store') }}" method="POST" class="space-y-5">
+                    @csrf
+                    
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Company Name</label>
+                        <input type="text" name="company_name" required placeholder="Enter company name" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                    </div>
+                    
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Supplied Item</label>
+                            <select name="item_id" required class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500 outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+                                <option value="">Select product...</option>
+                                
+                                @forelse($items as $item)
+                                    <option value="{{ $item->id }}">{{ $item->name }} ({{ $item->sku }})</option>
+                                @empty
+                                    <option value="" disabled>⚠️ No products found! Add items in Inventory first.</option>
+                                @endforelse
+                            </select>
+                    </div>
+
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Contact Number</label>
+                        <input type="text" name="contact_number" required placeholder="Enter contact number" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                    </div>
+
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Email Address</label>
+                        <input type="email" name="email" placeholder="Optional" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                    </div>
+
+                    <div class="mt-8 flex justify-end gap-3 pt-4">
+                        <button type="button" @click="showAddSupplierModal = false" class="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">
+                            Discard
+                        </button>
+                        <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700">
+                            Add Supplier
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
     </div>
 </x-layouts::app>

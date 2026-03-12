@@ -18,23 +18,5 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password123'),
             'role' => 'admin',
         ]);
-
-        // Create Cashier
-        User::create([
-            'name' => 'John Cashier',
-            'username' => 'cashier',
-            'email' => 'cashier@mabuhay.com',
-            'password' => Hash::make('password123'),
-            'role' => 'cashier',
-        ]);
-
-        // Create Inventory Manager
-        User::create([
-            'name' => 'Sarah Manager',
-            'username' => 'manager',
-            'email' => 'manager@mabuhay.com',
-            'password' => Hash::make('password123'),
-            'role' => 'inventory_manager',
-        ]);
     }
 }
