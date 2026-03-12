@@ -46,14 +46,43 @@
                         <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Sales & Purchase</h2>
                         <span class="rounded-md border border-zinc-200 px-2 py-1 text-xs text-zinc-500 dark:border-zinc-700">Weekly</span>
                     </div>
-                    <div class="mt-4 grid h-56 grid-cols-12 items-end gap-2 rounded-lg bg-zinc-50 p-3 dark:bg-zinc-800">
-                        <div class="h-32 rounded-t bg-sky-400"></div><div class="h-28 rounded-t bg-emerald-400"></div>
-                        <div class="h-40 rounded-t bg-sky-400"></div><div class="h-[8.5rem] rounded-t bg-emerald-400"></div>
-                        <div class="h-24 rounded-t bg-sky-400"></div><div class="h-[7.5rem] rounded-t bg-emerald-400"></div>
-                        <div class="h-36 rounded-t bg-sky-400"></div><div class="h-[6.5rem] rounded-t bg-emerald-400"></div>
-                        <div class="h-[9.75rem] rounded-t bg-sky-400"></div><div class="h-[8.25rem] rounded-t bg-emerald-400"></div>
-                        <div class="h-[7.75rem] rounded-t bg-sky-400"></div><div class="h-[7.25rem] rounded-t bg-emerald-400"></div>
+
+                    @php
+                        $chartHeight = 110;
+                        $chartBottom = 125;
+                        $points = $weeklyChart->count();
+                        $step = $points > 1 ? 320 / ($points - 1) : 0;
+
+                        $salesPoints = [];
+                        $purchasePoints = [];
+
+                        foreach ($weeklyChart as $index => $day) {
+                            $x = (int) round($index * $step);
+
+                            $salesY = $chartBottom - ($maxChartValue > 0 ? ($day['sales'] / $maxChartValue) * $chartHeight : 0);
+                            $purchaseY = $chartBottom - ($maxChartValue > 0 ? ($day['purchases'] / $maxChartValue) * $chartHeight : 0);
+
+                            $salesPoints[] = "{$x},{$salesY}";
+                            $purchasePoints[] = "{$x},{$purchaseY}";
+                        }
+
+                        $salesPoints = implode(' ', $salesPoints);
+                        $purchasePoints = implode(' ', $purchasePoints);
+                    @endphp
+
+                    <div class="mt-4">
+                        <svg viewBox="0 0 320 140" class="h-36 w-full">
+                            <polyline class="stroke-sky-400" fill="none" stroke-width="3" points="{{ $purchasePoints }}" />
+                            <polyline class="stroke-emerald-400" fill="none" stroke-width="3" points="{{ $salesPoints }}" />
+                        </svg>
+
+                        <div class="mt-2 grid grid-cols-7 text-[10px] text-zinc-500 dark:text-zinc-400">
+                            @foreach($weeklyChart as $day)
+                                <div class="text-center">{{ $day['label'] }}</div>
+                            @endforeach
+                        </div>
                     </div>
+
                     <div class="mt-2 flex items-center gap-4 text-xs text-zinc-500">
                         <span class="inline-flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-sky-400"></span> Purchase</span>
                         <span class="inline-flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-emerald-400"></span> Sales</span>

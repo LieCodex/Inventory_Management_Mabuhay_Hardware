@@ -11,12 +11,25 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Create Admin
-        User::create([
-            'name' => 'System Admin',
-            'username' => 'admin',
-            'email' => 'admin@mabuhay.com',
-            'password' => Hash::make('password123'),
-            'role' => 'admin',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@mabuhay.com'],
+            [
+                'name' => 'System Admin',
+                'username' => 'admin',
+                'password' => Hash::make('password123'),
+                'role' => 'admin',
+            ],
+        );
+
+        // Create Cashier (for testing cashier dashboard)
+        User::updateOrCreate(
+            ['email' => 'cashier@mabuhay.com'],
+            [
+                'name' => 'Cashier',
+                'username' => 'cashier',
+                'password' => Hash::make('password123'),
+                'role' => 'cashier',
+            ],
+        );
     }
 }
