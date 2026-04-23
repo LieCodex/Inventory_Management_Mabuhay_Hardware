@@ -17,6 +17,16 @@ class Item extends Model
 
     public function inventoryBatches()
     {
-        return $this->hasMany(InventoryBatch::class);
+        return $this->hasMany(InventoryBatch::class, 'item_id');
+    }
+
+    // Relationship for suppliers (used in Inventory page)
+    public function supplier()
+    {
+        return $this->hasOne(SupplierInfo::class, 'item_id');
+    }
+
+    public function sales() {
+    return $this->hasMany(SaleItem::class);
     }
 }

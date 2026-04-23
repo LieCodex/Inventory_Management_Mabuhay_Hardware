@@ -90,4 +90,46 @@ class InventoryController extends Controller
 
         return view('inventory_manager.item_details', compact('item'));
     }
+
+    public function dashboard()
+    {
+        // 1. Sales Metrics
+        $salesCount = DB::table('transactions')->count();
+        $revenue = DB::table('transactions')->sum('total_amount');
+        
+        // Cost calculation (Sum of price_per_unit at time of sale * quantity sold)
+        $cost = DB::table('transaction_items')
+            ->join('inventory_batches', 'transaction_items.batch_id', '=', 'inventory_batches.id')
+            ->sum(DB::raw('transaction_items.quantity * inventory_batches.price'));
+
+        $profit = $revenue - $cost;
+
+        // 2. Inventory Summaries
+        $quantityInHand = Item::sum('quantity_on_hand');
+        $toBeReceived = DB::table('supplier_infos')->sum('quantity_on_the_way');
+        $supplierCount = DB::table('supplier_infos')->distinct('company_name')->count();
+        $categoryCount = Item::whereNotNull('category')->distinct('category')->count();
+
+        // 3. Low Stock List
+        $lowStockItems = Item::whereColumn('quantity_on_hand', '<=', 'low_stock_threshold')
+            ->where('quantity_on_hand', '>=', 0)
+            ->get();
+
+        // 4. Top Selling Items (Table in Dashboard)
+        // We join transaction_items with Items to get names and pricing
+        $topSelling = DB::table('transaction_items')
+            ->join('items', 'transaction_items.item_id', '=', 'items.id')
+            ->select('items.id', 'items.name', 'items.quantity_on_hand', 'items.price_per_unit', 
+                    DB::raw('SUM(transaction_items.quantity) as total_sold'))
+            ->groupBy('items.id', 'items.name', 'items.quantity_on_hand', 'items.price_per_unit')
+            ->orderBy('total_sold', 'desc')
+            ->limit(3)
+            ->get();
+
+        return view('inventory_manager.dashboard', compact(
+            'salesCount', 'revenue', 'profit', 'cost', 
+            'topSelling', 'quantityInHand', 'toBeReceived', 
+            'supplierCount', 'categoryCount', 'lowStockItems'
+        ));
+    }
 }
