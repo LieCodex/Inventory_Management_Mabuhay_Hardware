@@ -24,20 +24,23 @@ class ReportController extends Controller
         $profit = $revenue - $cost;
 
         // 2. Net Values (Value of current warehouse stock)
-        $netPurchaseValue = InventoryBatch::sum(DB::raw('quantity_remaining * price')) ?? 0; // What you paid for current stock
-        $netSalesValue = Item::sum(DB::raw('quantity_on_hand * price_per_unit')) ?? 0; // What you will sell it for
+        $netPurchaseValue = InventoryBatch::sum(DB::raw('quantity_remaining * price')) ?? 0;
+        $netSalesValue = Item::sum(DB::raw('quantity_on_hand * price_per_unit')) ?? 0;
 
-        // 3. Month-over-Month (MoM) & Year-over-Year (YoY) Profit
+        // 3. Month-over-Month (MoM) & Year-over-Year (YoY)
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
 
-        $momRevenue = Transaction::whereMonth('transaction_date', $currentMonth)->whereYear('transaction_date', $currentYear)->sum('total_amount') ?? 0;
+        $momRevenue = Transaction::whereMonth('transaction_date', $currentMonth)
+            ->whereYear('transaction_date', $currentYear)->sum('total_amount') ?? 0;
+            
         $momCost = DB::table('transaction_items')
             ->join('transactions', 'transaction_items.transaction_id', '=', 'transactions.id')
             ->join('inventory_batches', 'transaction_items.batch_id', '=', 'inventory_batches.id')
             ->whereMonth('transactions.transaction_date', $currentMonth)
             ->whereYear('transactions.transaction_date', $currentYear)
             ->sum(DB::raw('transaction_items.quantity * inventory_batches.price')) ?? 0;
+            
         $momProfit = $momRevenue - $momCost;
 
         $yoyRevenue = Transaction::whereYear('transaction_date', $currentYear)->sum('total_amount') ?? 0;
@@ -46,6 +49,7 @@ class ReportController extends Controller
             ->join('inventory_batches', 'transaction_items.batch_id', '=', 'inventory_batches.id')
             ->whereYear('transactions.transaction_date', $currentYear)
             ->sum(DB::raw('transaction_items.quantity * inventory_batches.price')) ?? 0;
+            
         $yoyProfit = $yoyRevenue - $yoyCost;
 
         // 4. Best Selling Categories
@@ -66,11 +70,23 @@ class ReportController extends Controller
             ->take(4)
             ->get();
 
+        // 6. Chart Data for Profit & Revenue
+        // Fetching revenue grouped by month for the current year
+        $chartData = Transaction::whereYear('transaction_date', $currentYear)
+            ->selectRaw('DATE_FORMAT(transaction_date, "%b") as month, SUM(total_amount) as revenue')
+            ->groupBy('month')
+            ->orderBy('transaction_date')
+            ->get();
+
+        $chartLabels = $chartData->pluck('month');
+        $chartRevenue = $chartData->pluck('revenue');
+
         return view('inventory_manager.reports', compact(
             'revenue', 'cost', 'profit', 
             'netPurchaseValue', 'netSalesValue', 
             'momProfit', 'yoyProfit', 
-            'bestCategories', 'bestProducts'
+            'bestCategories', 'bestProducts',
+            'chartLabels', 'chartRevenue'
         ));
     }
 }

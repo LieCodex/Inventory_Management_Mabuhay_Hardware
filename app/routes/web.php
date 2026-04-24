@@ -8,6 +8,7 @@ use App\Http\Controllers\Inventory_manager\SupplierController;
 use App\Http\Controllers\Inventory_manager\InvManagerDashboardController;
 use App\Http\Controllers\Inventory_manager\ReportController;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Inventory_manager\ChartDataController;
 
 Route::redirect('/', '/dashboard')->name('home');
 
@@ -86,5 +87,9 @@ Route::get('/inventory-manager/reports', [ReportController::class, 'index'])
 Route::view('/cashier/dashboard', 'cashier.dashboard')
     ->middleware(['auth', 'role:cashier'])
     ->name('cashier.dashboard');
+
+//Charts Data
+Route::get('/inventory/chart/weekly', [ChartDataController::class, 'getWeeklyData'])
+    ->middleware('auth');
 
 require __DIR__.'/settings.php';

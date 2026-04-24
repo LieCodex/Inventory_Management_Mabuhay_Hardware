@@ -1,5 +1,6 @@
 <x-layouts::app :title="__('Dashboard')">
     <div class="space-y-4">
+        {{-- Search & Profile Header --}}
         <div class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
             <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div class="w-full max-w-xl">
@@ -19,6 +20,7 @@
         <div class="grid gap-4 xl:grid-cols-3">
             <div class="space-y-4 xl:col-span-2">
                 
+                {{-- Sales Overview --}}
                 <section class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
                     <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Sales Overview</h2>
                     <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -41,54 +43,19 @@
                     </div>
                 </section>
 
+                {{-- Sales & Purchase Chart --}}
                 <section class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Sales & Purchase</h2>
                         <span class="rounded-md border border-zinc-200 px-2 py-1 text-xs text-zinc-500 dark:border-zinc-700">Weekly</span>
                     </div>
 
-                    @php
-                        $chartHeight = 110;
-                        $chartBottom = 125;
-                        $points = $weeklyChart->count();
-                        $step = $points > 1 ? 320 / ($points - 1) : 0;
-
-                        $salesPoints = [];
-                        $purchasePoints = [];
-
-                        foreach ($weeklyChart as $index => $day) {
-                            $x = (int) round($index * $step);
-
-                            $salesY = $chartBottom - ($maxChartValue > 0 ? ($day['sales'] / $maxChartValue) * $chartHeight : 0);
-                            $purchaseY = $chartBottom - ($maxChartValue > 0 ? ($day['purchases'] / $maxChartValue) * $chartHeight : 0);
-
-                            $salesPoints[] = "{$x},{$salesY}";
-                            $purchasePoints[] = "{$x},{$purchaseY}";
-                        }
-
-                        $salesPoints = implode(' ', $salesPoints);
-                        $purchasePoints = implode(' ', $purchasePoints);
-                    @endphp
-
-                    <div class="mt-4">
-                        <svg viewBox="0 0 320 140" class="h-36 w-full">
-                            <polyline class="stroke-sky-400" fill="none" stroke-width="3" points="{{ $purchasePoints }}" />
-                            <polyline class="stroke-emerald-400" fill="none" stroke-width="3" points="{{ $salesPoints }}" />
-                        </svg>
-
-                        <div class="mt-2 grid grid-cols-7 text-[10px] text-zinc-500 dark:text-zinc-400">
-                            @foreach($weeklyChart as $day)
-                                <div class="text-center">{{ $day['label'] }}</div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div class="mt-2 flex items-center gap-4 text-xs text-zinc-500">
-                        <span class="inline-flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-sky-400"></span> Purchase</span>
-                        <span class="inline-flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-emerald-400"></span> Sales</span>
+                    <div class="mt-4 h-36 w-full">
+                        <canvas id="salesChart"></canvas>
                     </div>
                 </section>
 
+                {{-- Top Selling Stock --}}
                 <section class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
                     <div class="mb-3 flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Top Selling Stock</h2>
@@ -123,8 +90,8 @@
                 </section>
             </div>
 
+            {{-- Sidebar Column --}}
             <div class="space-y-4">
-                
                 <section class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
                     <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Inventory Summary</h2>
                     <div class="mt-4 grid gap-3 sm:grid-cols-2">
@@ -154,43 +121,67 @@
                 </section>
 
                 <section class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
-                    <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Order Summary</h2>
-                    <svg viewBox="0 0 320 140" class="mt-4 h-36 w-full">
-                        <polyline class="stroke-sky-400" fill="none" stroke-width="3" points="0,40 40,85 80,35 120,45 160,75 200,38 240,92 280,55 320,45" />
-                        <polyline class="stroke-amber-500" fill="none" stroke-width="3" points="0,30 40,100 80,60 120,88 160,70 200,80 240,110 280,90 320,80" />
-                    </svg>
-                    <div class="mt-2 flex items-center gap-4 text-xs text-zinc-500">
-                        <span class="inline-flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-amber-500"></span> Ordered</span>
-                        <span class="inline-flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-sky-400"></span> Sales</span>
-                    </div>
-                </section>
-
-                <section class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
-                    <div class="mb-3 flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Low Quantity Stock</h2>
-                        <a href="{{ route('inventory.index') }}" class="text-sm text-emerald-600 hover:underline">See All</a>
-                    </div>
-
-                    <div class="space-y-3 text-sm">
+                    <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Low Quantity Stock</h2>
+                    <div class="space-y-3 text-sm mt-4">
                         @forelse($lowStockItems as $item)
                             <div class="flex items-center justify-between rounded-lg bg-zinc-50 p-3 dark:bg-zinc-800">
                                 <div>
                                     <p class="font-medium text-zinc-800 dark:text-zinc-100">{{ $item->name }}</p>
                                     <p class="text-xs text-zinc-500">Remaining Quantity: {{ $item->quantity_on_hand }} {{ $item->unit_of_measure }}</p>
                                 </div>
-                                @if($item->quantity_on_hand == 0)
-                                    <span class="rounded-full bg-rose-100 px-2 py-0.5 text-xs text-rose-600 dark:bg-rose-900/40 dark:text-rose-300">Empty</span>
-                                @else
-                                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Low</span>
-                                @endif
+                                <span class="rounded-full px-2 py-0.5 text-xs {{ $item->quantity_on_hand == 0 ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' }}">
+                                    {{ $item->quantity_on_hand == 0 ? 'Empty' : 'Low' }}
+                                </span>
                             </div>
                         @empty
                             <p class="text-center text-sm text-zinc-500 py-4">All stock levels look good!</p>
                         @endforelse
                     </div>
                 </section>
-                
             </div>
         </div>
     </div>
+
+    {{-- Chart.js Script --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            const chartData = @json($weeklyChartData);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.map(d => d.label),
+                    datasets: [
+                        {
+                            label: 'Sales',
+                            data: chartData.map(d => d.sales),
+                            borderColor: '#10b981', // Emerald 500
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Purchase',
+                            data: chartData.map(d => d.purchases),
+                            borderColor: '#38bdf8', // Sky 400
+                            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { display: true, grid: { display: false } }, 
+                        y: { display: true, grid: { color: '#e4e4e7' } } 
+                    }
+                }
+            });
+        });
+    </script>
 </x-layouts::app>
