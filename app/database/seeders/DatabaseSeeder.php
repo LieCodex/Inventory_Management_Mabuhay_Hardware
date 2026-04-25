@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             Inventory_ManagerSeeder::class,
+            ChartDataSeeder::class,
         ]);
     }
 }

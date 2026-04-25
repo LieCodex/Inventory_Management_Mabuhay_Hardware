@@ -44,16 +44,7 @@
                 </section>
 
                 {{-- Sales & Purchase Chart --}}
-                <section class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Sales & Purchase</h2>
-                        <span class="rounded-md border border-zinc-200 px-2 py-1 text-xs text-zinc-500 dark:border-zinc-700">Weekly</span>
-                    </div>
-
-                    <div class="mt-4 h-36 w-full">
-                        <canvas id="salesChart"></canvas>
-                    </div>
-                </section>
+                <livewire:sales-and-purchases-chart />
 
                 {{-- Top Selling Stock --}}
                 <section class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
@@ -141,47 +132,4 @@
             </div>
         </div>
     </div>
-
-    {{-- Chart.js Script --}}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            const chartData = @json($weeklyChartData);
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: chartData.map(d => d.label),
-                    datasets: [
-                        {
-                            label: 'Sales',
-                            data: chartData.map(d => d.sales),
-                            borderColor: '#10b981', // Emerald 500
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Purchase',
-                            data: chartData.map(d => d.purchases),
-                            borderColor: '#38bdf8', // Sky 400
-                            backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        x: { display: true, grid: { display: false } }, 
-                        y: { display: true, grid: { color: '#e4e4e7' } } 
-                    }
-                }
-            });
-        });
-    </script>
 </x-layouts::app>

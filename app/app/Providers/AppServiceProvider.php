@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +25,15 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->registerLivewireComponents();
+    }
+
+    /**
+     * Register Livewire components.
+     */
+    protected function registerLivewireComponents(): void
+    {
+        Livewire::component('sales-and-purchases-chart', \App\Livewire\SalesAndPurchasesChart::class);
     }
 
     /**
