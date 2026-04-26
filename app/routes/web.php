@@ -8,7 +8,7 @@ use App\Http\Controllers\Inventory_manager\SupplierController;
 use App\Http\Controllers\Inventory_manager\InvManagerDashboardController;
 use App\Http\Controllers\Inventory_manager\ReportController;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Inventory_manager\ChartDataController;
+use App\Http\Controllers\Inventory_manager\DeliveryController;
 
 Route::redirect('/', '/dashboard')->name('home');
 
@@ -51,14 +51,6 @@ Route::post('/inventory-manager/inventory', [InventoryController::class, 'store'
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory.store'); 
 
-Route::view('/inventory-manager/reports', 'inventory_manager.reports')
-    ->middleware(['auth', 'role:inventory_manager'])
-    ->name('inventory_manager.reports');
-
-Route::view('/inventory-manager/suppliers', 'inventory_manager.suppliers')
-    ->middleware(['auth', 'role:inventory_manager'])
-    ->name('inventory_manager.suppliers');
-
 Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
 
 
@@ -81,6 +73,14 @@ Route::get('/inventory-manager/suppliers/{supplier}', [SupplierController::class
 Route::get('/inventory-manager/reports', [ReportController::class, 'index'])
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.reports');
+
+Route::get('/inventory-manager/deliveries', [DeliveryController::class, 'index'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.deliveries');
+
+Route::get('/inventory-manager/deliveries/{logId}', [DeliveryController::class, 'show'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.deliveries.show');
 
 
 // Cashier routes

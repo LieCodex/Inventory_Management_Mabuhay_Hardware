@@ -34,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
     protected function registerLivewireComponents(): void
     {
         Livewire::component('sales-and-purchases-chart', \App\Livewire\SalesAndPurchasesChart::class);
+        Livewire::component('dashboard-search', \App\Livewire\DashboardSearch::class);
     }
 
     /**
