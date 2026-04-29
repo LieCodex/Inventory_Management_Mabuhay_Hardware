@@ -143,10 +143,25 @@
     {{-- Script --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const ctx = document.getElementById('profitRevenueChart').getContext('2d');
+        // Declare the chart variable outside the listener so it persists
+        let profitRevenueChartInstance = null;
+
+        // Use 'livewire:navigated' instead of 'DOMContentLoaded'
+        document.addEventListener('livewire:navigated', () => {
+            const canvas = document.getElementById('profitRevenueChart');
             
-            new Chart(ctx, {
+            // Safety check in case the event fires but the canvas isn't in the DOM
+            if (!canvas) return; 
+
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy the existing chart instance before creating a new one
+            // This prevents Chart.js "Canvas is already in use" errors during navigation
+            if (profitRevenueChartInstance) {
+                profitRevenueChartInstance.destroy();
+            }
+
+            profitRevenueChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: @json($chartLabels),

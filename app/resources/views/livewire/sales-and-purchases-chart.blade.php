@@ -59,102 +59,85 @@
     </div>
 </div>
 
+{{-- 1. Use @assets to ensure Chart.js only loads once across your app --}}
+@assets
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@endassets
+
+{{-- 2. Use @script to automatically scope variables and run on component mount --}}
+@script
 <script>
     let chartInstance = null;
 
     function renderChart(data) {
         try {
-            console.log('renderChart called with:', data);
-            
-            if (!data || !Array.isArray(data) || data.length === 0) {
-                console.log('No data to render');
-                return;
-            }
+            if (!data || !Array.isArray(data) || data.length === 0) return;
 
             const canvas = document.getElementById('salesChart');
-            if (!canvas) {
-                console.log('Canvas not found');
-                return;
-            }
+            if (!canvas) return;
 
-            // Destroy existing chart FIRST
             if (chartInstance) {
-                console.log('Destroying existing chart');
                 chartInstance.destroy();
                 chartInstance = null;
             }
 
-            // Small delay to ensure canvas is reset
             setTimeout(() => {
-                try {
-                    const ctx = canvas.getContext('2d');
-                    console.log('Creating new chart with', data.length, 'data points');
-
-                    chartInstance = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: data.map(d => d.label),
-                            datasets: [
-                                {
-                                    label: 'Sales',
-                                    data: data.map(d => d.sales),
-                                    borderColor: '#10b981',
-                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                    fill: true,
-                                    tension: 0.3,
-                                    pointRadius: 4,
-                                    pointBackgroundColor: '#10b981'
-                                },
-                                {
-                                    label: 'Purchase',
-                                    data: data.map(d => d.purchases),
-                                    borderColor: '#38bdf8',
-                                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                                    fill: true,
-                                    tension: 0.3,
-                                    pointRadius: 4,
-                                    pointBackgroundColor: '#38bdf8'
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: true, position: 'top' }
+                const ctx = canvas.getContext('2d');
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => d.label),
+                        datasets: [
+                            {
+                                label: 'Sales',
+                                data: data.map(d => d.sales),
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#10b981'
                             },
-                            scales: {
-                                x: { display: true, grid: { display: false } },
-                                y: { display: true, grid: { color: '#e4e4e7' } }
+                            {
+                                label: 'Purchase',
+                                data: data.map(d => d.purchases),
+                                borderColor: '#38bdf8',
+                                backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#38bdf8'
                             }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: true, position: 'top' }
+                        },
+                        scales: {
+                            x: { display: true, grid: { display: false } },
+                            y: { display: true, grid: { color: '#e4e4e7' } }
                         }
-                    });
-                    console.log('Chart created successfully');
-                } catch (error) {
-                    console.error('Error creating chart:', error);
-                }
+                    }
+                });
             }, 50);
         } catch (error) {
             console.error('Error in renderChart:', error);
         }
     }
 
-    // Initial render
-    document.addEventListener('DOMContentLoaded', function() {
-        const initialData = @json($chartData);
-        console.log('Initial data:', initialData);
-        renderChart(initialData);
-    });
+    // 3. Instead of DOMContentLoaded, grab the initial data directly from $wire on mount
+    renderChart($wire.chartData);
 
-    // Listen for chart updates from Livewire
-    Livewire.on('chart-updated', (data) => {
-        console.log('Chart-updated event received:', data);
-        if (data && data.chartData) {
-            console.log('Chart data from event:', data.chartData);
-            renderChart(data.chartData);
-        } else {
-            console.log('No chartData in event, data is:', data);
+    // 4. Listen for the Livewire event
+    $wire.on('chart-updated', (event) => {
+        // Livewire 3 passes dispatched parameters inside an array
+        let payload = event[0] || event;
+        if (payload && payload.chartData) {
+            renderChart(payload.chartData);
         }
     });
 </script>
+@endscript
