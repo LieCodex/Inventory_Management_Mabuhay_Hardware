@@ -84,53 +84,53 @@
                     </div>
 
                     <div>
-                        <h3 class="mb-4 font-semibold text-zinc-800 dark:text-zinc-100">Supplied Item Details</h3>
-                        <div class="space-y-4 text-sm">
-                            <div class="grid grid-cols-2">
-                                <span class="text-zinc-500">Item Name</span>
-                                <span class="font-medium text-emerald-600 hover:underline dark:text-emerald-400">
-                                    @if($supplier->item)
-                                        <a href="{{ route('inventory.show', $supplier->item->id) }}">{{ $supplier->item->name }}</a>
-                                    @else
-                                        N/A
-                                    @endif
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-2">
-                                <span class="text-zinc-500">Item SKU</span>
-                                <span class="font-medium text-zinc-800 dark:text-zinc-200">{{ $supplier->item->sku ?? 'N/A' }}</span>
-                            </div>
-                            <div class="grid grid-cols-2">
-                                <span class="text-zinc-500">Category</span>
-                                <span class="font-medium text-zinc-800 dark:text-zinc-200">{{ $supplier->item->category ?? 'N/A' }}</span>
-                            </div>
+                        <h3 class="mb-4 font-semibold text-zinc-800 dark:text-zinc-100">Supplied Products</h3>
+                        <div class="space-y-3 text-sm">
+                            @forelse($supplierProducts as $productRow)
+                                <div class="rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
+                                    <div class="font-medium text-emerald-600 dark:text-emerald-400">
+                                        @if($productRow->item)
+                                            <a class="hover:underline" href="{{ route('inventory.show', $productRow->item->id) }}">{{ $productRow->item->name }}</a>
+                                        @else
+                                            N/A
+                                        @endif
+                                    </div>
+                                    <div class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                        SKU: {{ $productRow->item->sku ?? 'N/A' }} | Category: {{ $productRow->item->category ?? 'N/A' }}
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-zinc-500">No products linked to this supplier yet.</p>
+                            @endforelse
                         </div>
                     </div>
                 </div>
 
                 <div class="flex flex-col items-center sm:items-end">
                     <div class="mb-8 flex h-48 w-48 items-center justify-center rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/50">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-12 w-12 text-zinc-400">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
-                        </svg>
+                        @if($supplier->image_path)
+                            <img src="{{ \Illuminate\Support\Facades\Storage::url($supplier->image_path) }}" alt="{{ $supplier->company_name }}" class="h-full w-full rounded-xl object-cover" />
+                        @else
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-12 w-12 text-zinc-400">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+                            </svg>
+                        @endif
                     </div>
 
                     <div class="w-full max-w-sm space-y-6 text-sm">
                         <div class="flex items-center justify-between">
                             <span class="text-zinc-500">On the way</span>
-                            <span class="font-medium text-zinc-800 dark:text-zinc-200">{{ $supplier->quantity_on_the_way }}</span>
+                            <span class="font-medium text-zinc-800 dark:text-zinc-200">{{ $companyOnTheWay }}</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-zinc-500">ETA</span>
                             <span class="font-medium text-zinc-800 dark:text-zinc-200">
-                                {{ $supplier->eta ? \Carbon\Carbon::parse($supplier->eta)->format('M d, Y') : 'No active deliveries' }}
+                                {{ $companyEta ? \Carbon\Carbon::parse($companyEta)->format('M d, Y') : 'No active deliveries' }}
                             </span>
                         </div>
                         <div class="flex items-center justify-between border-t border-zinc-100 pt-4 dark:border-zinc-800">
-                            <span class="text-zinc-500">Current Store Stock</span>
-                            <span class="font-medium text-zinc-800 dark:text-zinc-200">
-                                {{ $supplier->item->quantity_on_hand ?? 0 }} {{ $supplier->item->unit_of_measure ?? '' }}
-                            </span>
+                            <span class="text-zinc-500">Products Supplied</span>
+                            <span class="font-medium text-zinc-800 dark:text-zinc-200">{{ $supplierProducts->count() }}</span>
                         </div>
                     </div>
                 </div>
@@ -141,62 +141,7 @@
                  x-transition:enter-start="opacity-0 translate-y-2" 
                  x-transition:enter-end="opacity-100 translate-y-0">
                 
-                <h3 class="mb-4 text-lg font-semibold text-zinc-800 dark:text-zinc-100">Delivery History</h3>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="text-zinc-500 border-b border-zinc-200 dark:border-zinc-800">
-                            <tr>
-                                <th class="py-3 font-medium">Date Received</th>
-                                <th class="py-3 font-medium">Logistics Company</th>
-                                <th class="py-3 font-medium">Quantity</th>
-                                <th class="py-3 font-medium">Unit Cost</th>
-                                <th class="py-3 font-medium text-right">Total Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-zinc-700 dark:text-zinc-200 divide-y divide-zinc-100 dark:divide-zinc-800/50">
-                            @forelse($deliveries as $delivery)
-                                <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                                    <td class="py-3">{{ \Carbon\Carbon::parse($delivery->delivery_date)->format('M d, Y') }}</td>
-                                    <td class="py-3">{{ $delivery->logistic_company }}</td>
-                                    <td class="py-3">{{ $delivery->quantity }}</td>
-                                    <td class="py-3">₱{{ number_format($delivery->unit_cost, 2) }}</td>
-                                    <td class="py-3 text-right font-medium">₱{{ number_format($delivery->quantity * $delivery->unit_cost, 2) }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="py-6 text-center text-zinc-500">No past deliveries found for this supplier.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4 dark:border-zinc-800">
-                    
-                    @if ($deliveries->onFirstPage())
-                        <button disabled class="cursor-not-allowed opacity-50 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                            Previous
-                        </button>
-                    @else
-                        <a href="{{ $deliveries->previousPageUrl() }}" class="inline-block rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
-                            Previous
-                        </a>
-                    @endif
-
-                    <span class="text-sm text-zinc-500">Page {{ $deliveries->currentPage() }} of {{ max(1, $deliveries->lastPage()) }}</span>
-
-                    @if ($deliveries->hasMorePages())
-                        <a href="{{ $deliveries->nextPageUrl() }}" class="inline-block rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
-                            Next
-                        </a>
-                    @else
-                        <button disabled class="cursor-not-allowed opacity-50 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                            Next
-                        </button>
-                    @endif
-                    
-                </div>
+                <livewire:supplier-deliveries :supplierId="$supplier->id" />
             </div>
 
             <div x-show="activeTab === 'logs'" style="display: none;" 

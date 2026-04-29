@@ -10,4 +10,10 @@ class Transaction extends Model
         'total_amount',
         'transaction_date',
     ];
+
+    // A transaction has many transaction items
+    public function transactionItems()
+    {
+        return $this->hasMany(TransactionItem::class);
+    }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Inventory_manager\InventoryController;
 use App\Http\Controllers\Inventory_manager\SupplierController;
 use App\Http\Controllers\Inventory_manager\InvManagerDashboardController;
 use App\Http\Controllers\Inventory_manager\ReportController;
+use App\Http\Controllers\Inventory_manager\ChartDataController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Inventory_manager\DeliveryController;
 
@@ -51,6 +52,10 @@ Route::post('/inventory-manager/inventory', [InventoryController::class, 'store'
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory.store'); 
 
+Route::get('/inventory-manager/inventory/export', [InventoryController::class, 'export'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.inventory.export');
+
 Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
 
 
@@ -65,6 +70,10 @@ Route::get('/inventory-manager/suppliers', [SupplierController::class, 'index'])
 Route::post('/inventory-manager/suppliers', [SupplierController::class, 'store'])
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.suppliers.store');
+
+Route::get('/inventory-manager/suppliers/export', [SupplierController::class, 'export'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.suppliers.export');
 
 Route::get('/inventory-manager/suppliers/{supplier}', [SupplierController::class, 'show'])
     ->middleware(['auth', 'role:inventory_manager'])

@@ -17,7 +17,8 @@ class SupplierInfo extends Model
         'contact_number', 
         'email', 
         'quantity_on_the_way', 
-        'eta'
+        'eta',
+        'image_path',
     ];
 
     public function item()

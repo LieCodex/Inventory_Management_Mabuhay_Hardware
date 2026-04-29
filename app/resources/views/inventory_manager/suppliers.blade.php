@@ -5,14 +5,7 @@
             <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <livewire:dashboard-search />
                 <div class="flex items-center gap-3">
-                    <div class="cursor-pointer rounded-full border border-zinc-200 p-2 text-zinc-500 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75v-.7V9a6 6 0 1 0-12 0v.05-.001v.7a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                        </svg>
-                    </div>
-                    <div class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -25,13 +18,9 @@
                     <button @click="showAddSupplierModal = true" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700">
                         Add Supplier
                     </button>
-                    <button class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" /></svg>
-                        Filters
-                    </button>
-                    <button class="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700">
+                    <a href="{{ route('inventory_manager.suppliers.export') }}" class="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700">
                         Download all
-                    </button>
+                    </a>
                 </div>
             </div>
 
@@ -40,7 +29,7 @@
                     <thead class="text-zinc-500">
                         <tr>
                             <th class="py-3 font-medium">Supplier Company</th>
-                            <th class="py-3 font-medium">Item</th>
+                            <th class="py-3 font-medium">Products</th>
                             <th class="py-3 font-medium">Contact Number</th>
                             <th class="py-3 font-medium">Email</th>
                             <th class="py-3 text-center font-medium">On the way</th>
@@ -50,11 +39,20 @@
                         <tbody class="text-zinc-700 dark:text-zinc-200">
                             @forelse($suppliers as $supplier)
                                 <tr 
-                                    onclick="window.location='{{ route('inventory_manager.suppliers.show', $supplier->id) }}'" 
+                                    onclick="window.location='{{ route('inventory_manager.suppliers.show', $supplier->primary_supplier_id) }}'" 
                                     class="border-t border-zinc-100 cursor-pointer transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50"
                                 >
                                     <td class="py-4 font-medium">{{ $supplier->company_name }}</td>
-                                    <td class="py-4">{{ $supplier->item ? $supplier->item->name : 'N/A' }}</td>
+                                    <td class="py-4">
+                                        @if(!empty($supplier->item_names))
+                                            {{ implode(', ', array_slice($supplier->item_names, 0, 3)) }}
+                                            @if(count($supplier->item_names) > 3)
+                                                <span class="text-zinc-500"> +{{ count($supplier->item_names) - 3 }} more</span>
+                                            @endif
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
                                     <td class="py-4">{{ $supplier->contact_number }}</td>
                                     <td class="py-4">{{ $supplier->email ?? 'No email' }}</td>
                                     <td class="py-4 text-center">{{ $supplier->quantity_on_the_way > 0 ? $supplier->quantity_on_the_way : '-' }}</td>
@@ -116,18 +114,26 @@
             >
                 <h3 class="mb-6 text-lg font-semibold text-zinc-800 dark:text-zinc-100">New Supplier</h3>
 
-                <form action="{{ route('inventory_manager.suppliers.store') }}" method="POST" class="space-y-5">
+                <form action="{{ route('inventory_manager.suppliers.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                     @csrf
                     
                     <div class="grid grid-cols-3 items-center gap-4">
                         <label class="text-sm text-zinc-600 dark:text-zinc-400">Company Name</label>
                         <input type="text" name="company_name" required placeholder="Enter company name" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
                     </div>
+
+                    <div class="grid grid-cols-3 items-center gap-4">
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Company Image</label>
+                        <div class="col-span-2">
+                            <input type="file" name="supplier_image" accept="image/*" class="block w-full text-sm text-zinc-600 file:mr-2 file:rounded file:border-0 file:bg-emerald-50 file:px-3 file:py-1.5 file:text-emerald-700 hover:file:bg-emerald-100 dark:text-zinc-300 dark:file:bg-zinc-700 dark:file:text-zinc-100" />
+                            @error('supplier_image') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
                     
                     <div class="grid grid-cols-3 items-center gap-4">
-                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Supplied Item</label>
-                            <select name="item_id" required class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500 outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
-                                <option value="">Select product...</option>
+                        <label class="text-sm text-zinc-600 dark:text-zinc-400">Supplied Products</label>
+                            <div class="col-span-2">
+                            <select name="item_ids[]" multiple required class="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500 outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 min-h-32">
                                 
                                 @forelse($items as $item)
                                     <option value="{{ $item->id }}">{{ $item->name }} ({{ $item->sku }})</option>
@@ -135,6 +141,8 @@
                                     <option value="" disabled>⚠️ No products found! Add items in Inventory first.</option>
                                 @endforelse
                             </select>
+                            <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Hold Ctrl (Windows) or Command (Mac) to select multiple products.</p>
+                            </div>
                     </div>
 
                     <div class="grid grid-cols-3 items-center gap-4">
