@@ -28,42 +28,22 @@ class DashboardSearch extends Component
     {
         $this->searchResults = [];
 
-        \Log::info('Starting search', ['query' => $query, 'query_length' => strlen($query)]);
-
-        // Search for suppliers by company name FIRST
-        \Log::info('Searching for suppliers...');
-        
-        // Test: Get all suppliers first
-        $allSuppliers = SupplierInfo::with('item')->get();
-        \Log::info('Total suppliers in database', ['count' => count($allSuppliers)]);
         
         // Now search
         $suppliers = SupplierInfo::with('item')
-            ->where('company_name', 'like', '%' . $query . '%')
-            ->get();
-        
-        \Log::info('Supplier query executed', [
-            'search_term' => '%' . $query . '%',
-            'count_found' => count($suppliers),
-            'all_suppliers' => $allSuppliers->pluck('company_name')->toArray()
-        ]);
+        ->where('company_name', 'like', '%' . $query . '%')
+        ->limit(5) 
+        ->get();
 
         $suppliersArray = $suppliers->map(function ($supplier) {
-            $url = '/inventory-manager/suppliers/' . $supplier->id;
-            \Log::info('Mapped supplier', [
-                'supplier_id' => $supplier->id,
-                'company_name' => $supplier->company_name,
-                'url' => $url
-            ]);
-            return [
-                'type' => 'supplier',
-                'id' => $supplier->id,
-                'name' => $supplier->company_name,
-                'subtitle' => 'Item: ' . ($supplier->item ? $supplier->item->name : 'Unknown') . ' | On the way: ' . $supplier->quantity_on_the_way,
-                'route' => $url,
-            ];
+                return [
+                    'type'     => 'supplier',
+                    'id'       => $supplier->id,
+                    'name'     => $supplier->company_name,
+                    'subtitle' => 'Item: ' . ($supplier->item ? $supplier->item->name : 'Unknown') . ' | On the way: ' . $supplier->quantity_on_the_way,
+                    'route'    => '/inventory-manager/suppliers/' . $supplier->id,
+                ];
         })->toArray();
-
         // Search for items by name or SKU
         $items = Item::where('name', 'like', '%' . $query . '%')
             ->orWhere('sku', 'like', '%' . $query . '%')

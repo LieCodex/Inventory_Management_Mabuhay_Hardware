@@ -26,7 +26,10 @@ class InvManagerDashboardController extends Controller
             'toBeReceived' => SupplierInfo::sum('quantity_on_the_way'),
             'supplierCount' => SupplierInfo::count(),
             'categoryCount' => Item::whereNotNull('category')->distinct('category')->count('category'),
-            'lowStockItems' => Item::whereColumn('quantity_on_hand', '<=', 'low_stock_threshold')->take(4)->get(),
+                'lowStockItems' => Item::whereColumn('quantity_on_hand', '<=', 'low_stock_threshold')
+        ->orderBy('quantity_on_hand', 'asc') // most critical first
+        ->take(4)
+        ->get(),
             'topSelling' => TransactionItem::with('item')->select('item_id', DB::raw('SUM(quantity) as total_sold'))->groupBy('item_id')->orderByDesc('total_sold')->take(4)->get(),
         ]);
     }

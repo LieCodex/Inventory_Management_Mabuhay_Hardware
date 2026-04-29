@@ -73,10 +73,10 @@ class ReportController extends Controller
         // 6. Chart Data for Profit & Revenue
         // Fetching revenue grouped by month for the current year
         $chartData = Transaction::whereYear('transaction_date', $currentYear)
-            ->selectRaw('DATE_FORMAT(transaction_date, "%b") as month, SUM(total_amount) as revenue')
-            ->groupBy('month')
-            ->orderBy('transaction_date')
-            ->get();
+        ->selectRaw('DATE_FORMAT(transaction_date, "%b") as month, MONTH(transaction_date) as month_num, SUM(total_amount) as revenue')
+        ->groupBy('month', 'month_num')         // group by both
+        ->orderBy('month_num')                  // order by the numeric month
+        ->get();
 
         $chartLabels = $chartData->pluck('month');
         $chartRevenue = $chartData->pluck('revenue');
