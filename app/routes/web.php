@@ -10,6 +10,7 @@ use App\Http\Controllers\Inventory_manager\ReportController;
 use App\Http\Controllers\Inventory_manager\ChartDataController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Inventory_manager\DeliveryController;
+use App\Livewire\ReceiptViewer;
 
 Route::redirect('/', '/dashboard')->name('home');
 
@@ -96,6 +97,10 @@ Route::get('/inventory-manager/deliveries/{logId}', [DeliveryController::class, 
 Route::view('/cashier/dashboard', 'cashier.dashboard')
     ->middleware(['auth', 'role:cashier'])
     ->name('cashier.dashboard');
+
+Route::get('/transactions', function () {
+    return view('cashier.transactions');
+})->name('transactions.index');
 
 //Charts Data
 Route::get('/inventory/chart/weekly', [ChartDataController::class, 'getWeeklyData'])

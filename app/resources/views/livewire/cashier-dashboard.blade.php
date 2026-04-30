@@ -11,13 +11,11 @@
                     autoupdate="false"
                 />
             </div>
-            <div class="flex items-center gap-3">
-                <div class="rounded-full border border-zinc-200 p-2 text-zinc-500 dark:border-zinc-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75v-.7V9a6 6 0 1 0-12 0v.05-.001v.7a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
-                </div>
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                </div>
+            
+            <div class="flex items-center justify-end">
+                <flux:button href="{{ route('transactions.index') }}" variant="outline" icon="document-text">
+                    Transaction History
+                </flux:button>
             </div>
         </div>
 
@@ -104,7 +102,7 @@
 
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div class="text-sm text-zinc-500">
-                            <div>Subtotal: <span class="font-semibold text-zinc-700 dark:text-zinc-100">₱ {{ number_format($this->total, 2) }}</span></div>
+                            <div>Subtotal: <span class="font-semibold text-zinc-700 dark:text-zinc-100"><br>₱ {{ number_format($this->total, 2) }}</span></div>
                         </div>
 
                         <div class="flex flex-col gap-2 sm:flex-row">
@@ -118,7 +116,7 @@
                                 </flux:button>
                             @endif
 
-                            <flux:button size="sm" variant="danger" wire:click.prevent="cart = []">
+                            <flux:button size="sm" variant="danger" wire:click.prevent="$set('cart', [])">
                                 Cancel Order
                             </flux:button>
                         </div>

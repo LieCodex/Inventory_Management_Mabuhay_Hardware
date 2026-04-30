@@ -144,40 +144,42 @@ class CashierDashboard extends Component
         return round(array_sum(array_column($this->cart, 'subtotal')), 2);
     }
 
-    public function checkout(): void
-    {
-        if (empty($this->cart)) {
-            $this->error = 'The basket is empty.';
-            return;
-        }
+public function checkout(): void
+{
+    if (empty($this->cart)) {
+        $this->error = 'The basket is empty.';
+        return;
+    }
+    $transactionTotal = round(array_sum(array_column($this->cart, 'subtotal')), 2);
+    DB::transaction(function () use ($transactionTotal) {
+        /** @var Transaction $transaction */
+        $transaction = Transaction::create([
+            'total_amount' => $transactionTotal,
+            'transaction_date' => now(),
+        ]);
 
-        DB::transaction(function () {
-            /** @var Transaction $transaction */
-            $transaction = Transaction::create([
-                'total_amount' => $this->total,
-                'transaction_date' => now(),
+        foreach ($this->cart as $item) {
+            $batchId = $this->consumeInventory($item['id'], $item['quantity']);
+
+            TransactionItem::create([
+                'transaction_id' => $transaction->id,
+                'item_id' => $item['id'],
+                'batch_id' => $batchId,
+                'quantity' => $item['quantity'],
+                'price_at_sale' => $item['price'],
+                'subtotal' => $item['subtotal'],
             ]);
 
-            foreach ($this->cart as $item) {
-                $batchId = $this->consumeInventory($item['id'], $item['quantity']);
+            Item::where('id', $item['id'])->decrement('quantity_on_hand', $item['quantity']);
+        }
+    });
 
-                TransactionItem::create([
-                    'transaction_id' => $transaction->id,
-                    'item_id' => $item['id'],
-                    'batch_id' => $batchId,
-                    'quantity' => $item['quantity'],
-                    'price_at_sale' => $item['price'],
-                    'subtotal' => $item['subtotal'],
-                ]);
-
-                Item::where('id', $item['id'])->decrement('quantity_on_hand', $item['quantity']);
-            }
-        });
-
-        $this->cart = [];
-        $this->message = 'Sale completed successfully.';
-        $this->error = null;
-    }
+    // 3. Clear the cart. Since getTotalProperty() was never called, 
+    // the view will calculate it fresh and see 0.00!
+    $this->cart = [];
+    $this->message = 'Sale completed successfully.';
+    $this->error = null;
+}
 
     protected function consumeInventory(int $itemId, int $quantity): ?int
     {

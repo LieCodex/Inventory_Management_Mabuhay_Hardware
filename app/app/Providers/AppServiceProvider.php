@@ -37,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         Livewire::component('dashboard-search', \App\Livewire\DashboardSearch::class);
         Livewire::component('item-details', \App\Livewire\ItemDetails::class);
         Livewire::component('supplier-deliveries', \App\Livewire\SupplierDeliveries::class);
+        Livewire::component('receipt-viewer', \App\Livewire\ReceiptViewer::class);
     }
 
     /**

@@ -16,4 +16,10 @@ class Transaction extends Model
     {
         return $this->hasMany(TransactionItem::class);
     }
+
+    // Alias for transactionItems
+    public function items()
+    {
+        return $this->transactionItems();
+    }
 }
