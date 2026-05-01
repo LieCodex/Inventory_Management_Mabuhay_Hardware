@@ -3,14 +3,7 @@
         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <livewire:dashboard-search />
             <div class="flex items-center gap-3">
-                <div class="cursor-pointer rounded-full border border-zinc-200 p-2 text-zinc-500 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75v-.7V9a6 6 0 1 0-12 0v.05-.001v.7a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                    </svg>
-                </div>
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                </div>
+
             </div>
         </div>
     </div>
@@ -27,7 +20,7 @@
             </div>
             
             <div class="flex items-center gap-3">
-                <button class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700">
+                <button wire:click="openEditModal" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
                     Edit
                 </button>
@@ -206,8 +199,8 @@
                             <tr class="border-b border-zinc-200 dark:border-zinc-700">
                                 <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300">Date</th>
                                 <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300">Type</th>
+                                <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300">Change Details</th>
                                 <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300">Quantity Change</th>
-                                <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300">Remarks</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -215,16 +208,36 @@
                                 <tr class="border-b border-zinc-100 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50">
                                     <td class="px-4 py-3 text-zinc-700 dark:text-zinc-300">{{ $adjustment->created_at->format('M d, Y H:i') }}</td>
                                     <td class="px-4 py-3">
-                                        <span class="inline-block rounded-full px-3 py-1 text-xs font-medium {{ $adjustment->quantity_change > 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' }}">
-                                            {{ ucfirst($adjustment->type) }}
-                                        </span>
+                                        @if($adjustment->type === 'item_details')
+                                            <span class="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                                                Item Details
+                                            </span>
+                                        @else
+                                            <span class="inline-block rounded-full px-3 py-1 text-xs font-medium {{ $adjustment->quantity_change > 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' }}">
+                                                {{ ucfirst($adjustment->type) }}
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3 text-zinc-700 dark:text-zinc-300">
+                                        @if($adjustment->type === 'item_details')
+                                            <div class="space-y-1">
+                                                @foreach(explode(' | ', $adjustment->remarks ?? '') as $change)
+                                                    <div class="text-xs">{{ trim($change) }}</div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            {{ $adjustment->remarks ?? 'N/A' }}
+                                        @endif
                                     </td>
                                     <td class="px-4 py-3">
-                                        <span class="{{ $adjustment->quantity_change > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' }} font-medium">
-                                            {{ $adjustment->quantity_change > 0 ? '+' : '' }}{{ $adjustment->quantity_change }}
-                                        </span>
+                                        @if($adjustment->type !== 'item_details')
+                                            <span class="{{ $adjustment->quantity_change > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' }} font-medium">
+                                                {{ $adjustment->quantity_change > 0 ? '+' : '' }}{{ $adjustment->quantity_change }}
+                                            </span>
+                                        @else
+                                            -
+                                        @endif
                                     </td>
-                                    <td class="px-4 py-3 text-zinc-700 dark:text-zinc-300">{{ $adjustment->remarks ?? 'N/A' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -296,5 +309,99 @@
         </div>
         @endif
     </div>
+
+    @if($showEditModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+            <div class="w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
+                <div class="mb-6 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Edit Item</h3>
+                        <p class="text-sm text-zinc-500 dark:text-zinc-400">Update item details and reference the most recent purchase price.</p>
+                    </div>
+                    <button type="button" wire:click="closeEditModal" class="text-zinc-500 transition hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200">✕</button>
+                </div>
+
+                @if($recentDeliveryPrice)
+                    <div class="mb-4 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-200">
+                        Most recent delivery paid: <strong>₱{{ number_format($recentDeliveryPrice, 2) }}</strong> per unit
+                        @if($recentDeliveryDate)
+                            on {{ $recentDeliveryDate }}
+                        @endif
+                        @if($recentDeliverySupplier)
+                            from {{ $recentDeliverySupplier }}
+                        @endif
+                    </div>
+                @endif
+
+                <form wire:submit.prevent="updateItem" class="grid gap-4">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400">Item Name</label>
+                            <input type="text" wire:model.defer="name" class="mt-1 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
+                            @error('name') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400">Item ID (SKU)</label>
+                            <input type="text" wire:model.defer="sku" class="mt-1 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
+                            @error('sku') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400">Category</label>
+                            <select wire:model.defer="category" class="mt-1 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700 outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                <option value="">Select item category</option>
+                                @foreach($availableCategories as $cat)
+                                    <option value="{{ $cat }}">{{ $cat }}</option>
+                                @endforeach
+                            </select>
+                            @error('category') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400">Unit</label>
+                            <input type="text" wire:model.defer="unit_of_measure" class="mt-1 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
+                            @error('unit_of_measure') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400">Buying Price</label>
+                            <input type="number" step="0.01" wire:model.defer="price_per_unit" class="mt-1 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
+                            @error('price_per_unit') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400">Quantity</label>
+                            <input type="number" wire:model.defer="quantity_on_hand" class="mt-1 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
+                            @error('quantity_on_hand') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400">Threshold Value</label>
+                            <input type="number" wire:model.defer="low_stock_threshold" class="mt-1 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
+                            @error('low_stock_threshold') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400">Description</label>
+                            <input type="text" wire:model.defer="description" class="mt-1 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
+                            @error('description') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                        <button type="button" wire:click="closeEditModal" class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700">
+                            Cancel
+                        </button>
+                        <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
 </div>
 

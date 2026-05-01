@@ -32,10 +32,10 @@ class Item extends Model
         return $this->hasMany(InventoryLog::class);
     }
 
-    // Get only adjustment logs
+    // Get only adjustment logs (including item detail changes)
     public function adjustmentLogs()
     {
-        return $this->inventoryLogs()->where('type', 'adjustment');
+        return $this->inventoryLogs()->whereIn('type', ['adjustment', 'item_details']);
     }
 
     // Get sales transactions for this item

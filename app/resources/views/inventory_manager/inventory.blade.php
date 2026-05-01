@@ -241,8 +241,9 @@
                         <label class="text-sm text-zinc-600 dark:text-zinc-400">Category</label>
                         <select name="category" class="col-span-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500 outline-none ring-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
                             <option value="">Select item category</option>
-                            <option value="Tools">Tools</option>
-                            <option value="Materials">Materials</option>
+                            @foreach($availableCategories as $cat)
+                                <option value="{{ $cat }}">{{ $cat }}</option>
+                            @endforeach
                         </select>
                     </div>
 

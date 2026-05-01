@@ -71,9 +71,16 @@ class InventoryController extends Controller
                 
             $outOfStock = Item::where('quantity_on_hand', 0)->count();
 
+            // 5. Available Categories
+            $availableCategories = Item::whereNotNull('category')
+                ->distinct()
+                ->pluck('category')
+                ->sort()
+                ->values();
+
             return view('inventory_manager.inventory', compact(
                 'items', 'categoryCount', 'totalProducts', 'revenue7Days', 
-                'topSelling', 'cost7Days', 'lowStocks', 'outOfStock'
+                'topSelling', 'cost7Days', 'lowStocks', 'outOfStock', 'availableCategories'
             ));
         }
 
