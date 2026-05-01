@@ -71,22 +71,43 @@ class ReportController extends Controller
             ->get();
 
         // 6. Chart Data for Profit & Revenue
-        // Fetching revenue grouped by month for the current year
-        $chartData = Transaction::whereYear('transaction_date', $currentYear)
-        ->selectRaw('DATE_FORMAT(transaction_date, "%b") as month, MONTH(transaction_date) as month_num, SUM(total_amount) as revenue')
-        ->groupBy('month', 'month_num')         // group by both
-        ->orderBy('month_num')                  // order by the numeric month
-        ->get();
+        $monthlyRevenue = Transaction::whereYear('transaction_date', $currentYear)
+            ->selectRaw('MONTH(transaction_date) as month_num, DATE_FORMAT(transaction_date, "%b") as month, SUM(total_amount) as revenue')
+            ->groupBy('month_num', 'month')
+            ->orderBy('month_num')
+            ->get()
+            ->keyBy('month_num');
 
-        $chartLabels = $chartData->pluck('month');
-        $chartRevenue = $chartData->pluck('revenue');
+        $monthlyCost = DB::table('transactions')
+            ->join('transaction_items', 'transactions.id', '=', 'transaction_items.transaction_id')
+            ->join('inventory_batches', 'transaction_items.batch_id', '=', 'inventory_batches.id')
+            ->whereYear('transactions.transaction_date', $currentYear)
+            ->selectRaw('MONTH(transactions.transaction_date) as month_num, SUM(transaction_items.quantity * inventory_batches.price) as cost')
+            ->groupBy('month_num')
+            ->get()
+            ->keyBy('month_num');
+
+        $chartLabels = [];
+        $chartRevenue = [];
+        $chartProfit = [];
+
+        // Combine the data
+        foreach ($monthlyRevenue as $monthNum => $data) {
+            $chartLabels[] = $data->month;
+            
+            $rev = $data->revenue;
+            $costVal = isset($monthlyCost[$monthNum]) ? $monthlyCost[$monthNum]->cost : 0;
+            
+            $chartRevenue[] = $rev;
+            $chartProfit[] = $rev - $costVal;
+        }
 
         return view('inventory_manager.reports', compact(
             'revenue', 'cost', 'profit', 
             'netPurchaseValue', 'netSalesValue', 
             'momProfit', 'yoyProfit', 
             'bestCategories', 'bestProducts',
-            'chartLabels', 'chartRevenue'
+            'chartLabels', 'chartRevenue', 'chartProfit' // <-- Added chartProfit here
         ));
     }
 }

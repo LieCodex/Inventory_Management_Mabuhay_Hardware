@@ -55,7 +55,7 @@
             <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
                 <div class="mb-6 flex items-center justify-between">
                     <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Best selling category</h2>
-                    <a href="#" class="text-sm font-medium text-sky-500 hover:text-sky-400">See All</a>
+                    <a href="{{ route('inventory_manager.inventory') }}" class="text-sm font-medium text-sky-500 hover:text-sky-400">See All</a>
                 </div>
 
                 <table class="w-full text-left text-sm">
@@ -98,7 +98,7 @@
         <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
             <div class="mb-6 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Best selling product</h2>
-                <a href="{{ route('inventory.index') }}" class="text-sm font-medium text-sky-500 hover:text-sky-400">See All</a>
+                <a href="{{ route('inventory_manager.inventory') }}" class="text-sm font-medium text-sky-500 hover:text-sky-400">See All</a>
             </div>
 
             <div class="overflow-x-auto">
@@ -136,46 +136,113 @@
     {{-- Script --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Declare the chart variable outside the listener so it persists
-        let profitRevenueChartInstance = null;
-
-        // Use 'livewire:navigated' instead of 'DOMContentLoaded'
+        // 1. Listen for when the page is fully loaded via Livewire
         document.addEventListener('livewire:navigated', () => {
             const canvas = document.getElementById('profitRevenueChart');
-            
-            // Safety check in case the event fires but the canvas isn't in the DOM
             if (!canvas) return; 
 
             const ctx = canvas.getContext('2d');
             
-            // Destroy the existing chart instance before creating a new one
-            // This prevents Chart.js "Canvas is already in use" errors during navigation
-            if (profitRevenueChartInstance) {
-                profitRevenueChartInstance.destroy();
+            // 2. Check the global window object. If a chart exists, destroy it.
+            if (window.profitRevenueChartInstance) {
+                window.profitRevenueChartInstance.destroy();
             }
 
-            profitRevenueChartInstance = new Chart(ctx, {
-                type: 'line',
+            const currencyFormatter = new Intl.NumberFormat('en-PH', {
+                style: 'currency',
+                currency: 'PHP',
+                minimumFractionDigits: 0,
+            });
+
+            // 3. Assign the new chart to the global window object
+            window.profitRevenueChartInstance = new Chart(ctx, {
+                type: 'bar',
                 data: {
                     labels: @json($chartLabels),
-                    datasets: [{
-                        label: 'Revenue',
-                        data: @json($chartRevenue),
-                        borderColor: '#0ea5e9',
-                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Profit',
+                            data: @json($chartProfit),
+                            borderColor: '#10b981',
+                            backgroundColor: '#10b981',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#10b981',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0.3,
+                            order: 1
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Revenue',
+                            data: @json($chartRevenue),
+                            backgroundColor: 'rgba(14, 165, 233, 0.15)',
+                            borderColor: '#0ea5e9',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            order: 2
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { usePointStyle: true, boxWidth: 8 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += currencyFormatter.format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
                     scales: {
-                        y: { grid: { color: '#e4e4e7' } },
-                        x: { grid: { display: false } }
+                        y: { 
+                            beginAtZero: true,
+                            grid: { 
+                                color: '#e4e4e7',
+                                drawBorder: false 
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    if (value >= 1000000) return '₱' + (value / 1000000).toFixed(1) + 'M';
+                                    if (value >= 1000) return '₱' + (value / 1000).toFixed(0) + 'k';
+                                    return '₱' + value;
+                                }
+                            }
+                        },
+                        x: { 
+                            grid: { display: false } 
+                        }
                     }
                 }
             });
+        });
+
+        // 4. Memory cleanup: Destroy the chart right BEFORE you leave the page
+        document.addEventListener('livewire:navigating', () => {
+            if (window.profitRevenueChartInstance) {
+                window.profitRevenueChartInstance.destroy();
+                window.profitRevenueChartInstance = null; // Clear it out
+            }
         });
     </script>
 </x-layouts::app>
