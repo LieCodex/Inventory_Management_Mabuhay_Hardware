@@ -37,6 +37,9 @@
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
 
+                    <flux:sidebar.item icon="document-text" :href="route('transactions.index')" :current="request()->routeIs('transactions.index')" wire:navigate>
+                        {{ __('Transactions') }}
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 @endif

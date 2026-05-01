@@ -11,12 +11,6 @@
                     autoupdate="false"
                 />
             </div>
-            
-            <div class="flex items-center justify-end">
-                <flux:button href="{{ route('transactions.index') }}" variant="outline" icon="document-text">
-                    Transaction History
-                </flux:button>
-            </div>
         </div>
 
         <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
