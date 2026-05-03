@@ -4,16 +4,25 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\PasswordResetApproval;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 
 class AdminDashboardController extends Controller
 {
     public function index()
     {
-        // Fetch all users to display in the table
         $users = User::latest()->get();
-        return view('admin.dashboard', compact('users'));
+        
+        // Fetch pending requests to display on the dashboard
+        $pendingResets = PasswordResetApproval::with('user')
+            ->where('status', 'pending')
+            ->latest()
+            ->get();
+
+        // Make sure 'pendingResets' is included inside the compact() function!
+        return view('admin.dashboard', compact('users', 'pendingResets'));
     }
 
     public function storeUser(Request $request)
@@ -46,5 +55,23 @@ class AdminDashboardController extends Controller
 
         $user->delete();
         return back()->with('status', 'User deleted successfully.');
+    }
+
+    public function approveReset(PasswordResetApproval $approval)
+    {
+        // Generate the standard Laravel reset token & send email
+        $token = Password::getRepository()->create($approval->user);
+        $approval->user->sendPasswordResetNotification($token);
+
+        // Mark as approved
+        $approval->update(['status' => 'approved']);
+
+        return back()->with('status', 'Password reset approved. Email sent to user.');
+    }
+
+    public function rejectReset(PasswordResetApproval $approval)
+    {
+        $approval->update(['status' => 'rejected']);
+        return back()->with('status', 'Password reset request rejected.');
     }
 }

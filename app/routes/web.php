@@ -11,6 +11,7 @@ use App\Http\Controllers\Inventory_manager\ChartDataController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Inventory_manager\DeliveryController;
 use App\Livewire\ReceiptViewer;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 
 Route::redirect('/', '/dashboard')->name('home');
 
@@ -39,6 +40,10 @@ Route::get('/dashboard', function (Request $request) {
         default => abort(403, 'Unauthorized.'),
     };
 })->middleware(['auth'])->name('dashboard');
+
+Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
+    ->middleware('guest')
+    ->name('password.email');
 
 // Inventory Manager routes
 Route::get('/inventory-manager/dashboard', [InvManagerDashboardController::class, 'index'])
@@ -91,7 +96,9 @@ Route::get('/inventory-manager/deliveries', [DeliveryController::class, 'index']
 Route::get('/inventory-manager/deliveries/{logId}', [DeliveryController::class, 'show'])
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.deliveries.show');
-
+//notif
+Route::post('/admin/reset-approvals/{approval}/approve', [AdminDashboardController::class, 'approveReset'])->name('admin.resets.approve');
+Route::post('/admin/reset-approvals/{approval}/reject', [AdminDashboardController::class, 'rejectReset'])->name('admin.resets.reject');
 
 // Cashier routes
 Route::view('/cashier/dashboard', 'cashier.dashboard')
