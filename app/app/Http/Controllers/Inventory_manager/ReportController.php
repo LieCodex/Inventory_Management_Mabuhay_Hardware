@@ -52,15 +52,49 @@ class ReportController extends Controller
             
         $yoyProfit = $yoyRevenue - $yoyCost;
 
-        // 4. Best Selling Categories
+        // 4. Best Selling Categories with Trends
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $previousMonth = Carbon::now()->subMonth()->month;
+        $previousMonthYear = Carbon::now()->subMonth()->year;
+
         $bestCategories = DB::table('transaction_items')
             ->join('items', 'transaction_items.item_id', '=', 'items.id')
-            ->select('items.category', DB::raw('SUM(transaction_items.subtotal) as turnover'))
+            ->join('transactions', 'transaction_items.transaction_id', '=', 'transactions.id')
+            ->select(
+                'items.category',
+                DB::raw('SUM(transaction_items.subtotal) as total_turnover'),
+                DB::raw('SUM(CASE WHEN MONTH(transactions.transaction_date) = ' . $currentMonth . ' AND YEAR(transactions.transaction_date) = ' . $currentYear . ' THEN transaction_items.subtotal ELSE 0 END) as current_turnover'),
+                DB::raw('SUM(CASE WHEN MONTH(transactions.transaction_date) = ' . $previousMonth . ' AND YEAR(transactions.transaction_date) = ' . $previousMonthYear . ' THEN transaction_items.subtotal ELSE 0 END) as previous_turnover')
+            )
             ->whereNotNull('items.category')
             ->groupBy('items.category')
-            ->orderByDesc('turnover')
+            ->having('total_turnover', '>', 0)
+            ->orderByDesc('total_turnover')
             ->take(4)
-            ->get();
+            ->get()
+            ->map(function ($category) {
+                $current = $category->current_turnover;
+                $previous = $category->previous_turnover;
+
+                if ($current > 0 && $previous > 0) {
+                    $trend = (($current - $previous) / $previous) * 100;
+                    $category->trend_percentage = round($trend, 1);
+                    $category->trend_direction = $trend > 0 ? 'up' : ($trend < 0 ? 'down' : 'flat');
+                } elseif ($current > 0 && $previous === 0) {
+                    $category->trend_percentage = null;
+                    $category->trend_direction = 'new';
+                } elseif ($current === 0 && $previous > 0) {
+                    $category->trend_percentage = 100;
+                    $category->trend_direction = 'down';
+                } else {
+                    $category->trend_percentage = null;
+                    $category->trend_direction = 'flat';
+                }
+
+                $category->turnover = $category->total_turnover;
+                return $category;
+            });
 
         // 5. Best Selling Products
         $bestProducts = TransactionItem::with('item')

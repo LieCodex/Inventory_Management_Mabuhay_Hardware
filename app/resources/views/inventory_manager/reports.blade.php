@@ -71,7 +71,27 @@
                             <tr class="border-t border-zinc-100 dark:border-zinc-800">
                                 <td class="py-3">{{ $category->category }}</td>
                                 <td class="py-3">₱{{ number_format($category->turnover, 2) }}</td>
-                                <td class="py-3 text-right text-emerald-500">--</td>
+                                <td class="py-3 text-right">
+                                    @if($category->trend_direction === 'up')
+                                        <span class="text-emerald-500 flex items-center justify-end gap-1">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $category->trend_percentage }}%
+                                        </span>
+                                    @elseif($category->trend_direction === 'down')
+                                        <span class="text-red-500 flex items-center justify-end gap-1">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ abs($category->trend_percentage) }}%
+                                        </span>
+                                    @elseif($category->trend_direction === 'new')
+                                        <span class="text-blue-500">New</span>
+                                    @else
+                                        <span class="text-zinc-500">--</span>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr>
