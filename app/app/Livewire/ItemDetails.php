@@ -6,6 +6,8 @@ use Livewire\Component;
 use Illuminate\Validation\Rule;
 use App\Models\Item;
 use App\Models\InventoryLog;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ItemDetails extends Component
 {
@@ -25,6 +27,7 @@ class ItemDetails extends Component
     public $recentDeliveryDate;
     public $recentDeliverySupplier;
     public $availableCategories = [];
+    public $categoryTrendStats = null;
 
     public function mount($itemId)
     {
@@ -35,6 +38,7 @@ class ItemDetails extends Component
         $this->loadAvailableCategories();
         $this->fillItemFields();
         $this->loadRecentDeliveryReference();
+        $this->loadCategoryTrendStats();
     }
 
     protected function loadAvailableCategories()
@@ -73,10 +77,75 @@ class ItemDetails extends Component
         }
     }
 
+    protected function loadCategoryTrendStats(): void
+    {
+        $category = $this->item->category;
+        if (empty($category)) {
+            $this->categoryTrendStats = null;
+            return;
+        }
+
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $previousMonth = Carbon::now()->subMonth()->month;
+        $previousMonthYear = Carbon::now()->subMonth()->year;
+
+        $row = DB::table('transaction_items')
+            ->join('items', 'transaction_items.item_id', '=', 'items.id')
+            ->join('transactions', 'transaction_items.transaction_id', '=', 'transactions.id')
+            ->where('items.category', $category)
+            ->selectRaw('
+                items.category as category,
+                SUM(transaction_items.subtotal) as total_turnover,
+                SUM(CASE WHEN MONTH(transactions.transaction_date) = ? AND YEAR(transactions.transaction_date) = ? THEN transaction_items.subtotal ELSE 0 END) as current_turnover,
+                SUM(CASE WHEN MONTH(transactions.transaction_date) = ? AND YEAR(transactions.transaction_date) = ? THEN transaction_items.subtotal ELSE 0 END) as previous_turnover
+            ', [$currentMonth, $currentYear, $previousMonth, $previousMonthYear])
+            ->groupBy('items.category')
+            ->first();
+
+        $rank = DB::table('transaction_items')
+            ->join('items', 'transaction_items.item_id', '=', 'items.id')
+            ->whereNotNull('items.category')
+            ->select('items.category', DB::raw('SUM(transaction_items.subtotal) as turnover'))
+            ->groupBy('items.category')
+            ->orderByDesc('turnover')
+            ->get()
+            ->pluck('category')
+            ->search($category);
+
+        $current = (float) ($row->current_turnover ?? 0);
+        $previous = (float) ($row->previous_turnover ?? 0);
+
+        $trendPercentage = null;
+        $trendDirection = 'flat';
+        if ($current > 0 && $previous > 0) {
+            $trend = (($current - $previous) / $previous) * 100;
+            $trendPercentage = round($trend, 1);
+            $trendDirection = $trend > 0 ? 'up' : ($trend < 0 ? 'down' : 'flat');
+        } elseif ($current > 0 && $previous == 0.0) {
+            $trendPercentage = null;
+            $trendDirection = 'new';
+        } elseif ($current == 0.0 && $previous > 0) {
+            $trendPercentage = 100.0;
+            $trendDirection = 'down';
+        }
+
+        $this->categoryTrendStats = [
+            'category' => $category,
+            'current_turnover' => (float) ($row->current_turnover ?? 0),
+            'previous_turnover' => (float) ($row->previous_turnover ?? 0),
+            'total_turnover' => (float) ($row->total_turnover ?? 0),
+            'trend_percentage' => $trendPercentage,
+            'trend_direction' => $trendDirection,
+            'rank' => is_int($rank) ? $rank + 1 : null,
+        ];
+    }
+
     public function openEditModal()
     {
         $this->fillItemFields();
         $this->loadRecentDeliveryReference();
+        $this->loadCategoryTrendStats();
         $this->showEditModal = true;
     }
 
@@ -137,6 +206,7 @@ class ItemDetails extends Component
         $this->item->refresh();
         $this->fillItemFields();
         $this->loadRecentDeliveryReference();
+        $this->loadCategoryTrendStats();
         $this->showEditModal = false;
 
         session()->flash('success', 'Item details updated successfully.');
@@ -155,6 +225,7 @@ class ItemDetails extends Component
             'adjustments' => $this->item->adjustmentLogs()->orderByDesc('created_at')->get(),
             'allHistory' => $this->item->inventoryLogs()->orderByDesc('created_at')->get(),
             'sales' => $this->item->transactionItems()->with('item')->orderByDesc('created_at')->get(),
+            'categoryTrendStats' => $this->categoryTrendStats,
         ]);
     }
 }

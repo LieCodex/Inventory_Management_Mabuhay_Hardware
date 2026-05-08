@@ -165,4 +165,42 @@ class InventoryController extends Controller
             fclose($handle);
         }, $filename, ['Content-Type' => 'text/csv']);
     }
+
+    public function downloadItem(Item $item)
+    {
+        $item->load(['inventoryBatches' => function ($query) {
+            $query->orderBy('expiry_date', 'asc');
+        }]);
+
+        $filename = 'item_' . $item->sku . '_' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($item) {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, ['Field', 'Value']);
+            fputcsv($handle, ['Name', $item->name]);
+            fputcsv($handle, ['SKU', $item->sku]);
+            fputcsv($handle, ['Category', $item->category]);
+            fputcsv($handle, ['Buying Price', $item->price_per_unit]);
+            fputcsv($handle, ['Quantity on hand', $item->quantity_on_hand]);
+            fputcsv($handle, ['Unit', $item->unit_of_measure]);
+            fputcsv($handle, ['Low stock threshold', $item->low_stock_threshold]);
+            fputcsv($handle, ['Image path', $item->image_path]);
+            fputcsv($handle, []);
+
+            fputcsv($handle, ['Batches']);
+            fputcsv($handle, ['Batch ID', 'Quantity Remaining', 'Price', 'Expiry Date', 'Created At']);
+            foreach ($item->inventoryBatches as $batch) {
+                fputcsv($handle, [
+                    $batch->id,
+                    $batch->quantity_remaining,
+                    $batch->price,
+                    $batch->expiry_date,
+                    $batch->created_at,
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv']);
+    }
 }

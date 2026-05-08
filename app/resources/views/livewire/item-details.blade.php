@@ -24,9 +24,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
                     Edit
                 </button>
-                <button class="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700">
+                <a href="{{ route('inventory_manager.inventory.item.download', $item->id) }}" class="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700">
                     Download
-                </button>
+                </a>
             </div>
         </div>
 
@@ -90,6 +90,44 @@
                             </div>
                         </div>
                     </div>
+
+                    @if(!empty($categoryTrendStats))
+                        <div>
+                            <h3 class="mb-4 font-semibold text-zinc-800 dark:text-zinc-100">Category Trend (Reports)</h3>
+                            <div class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm dark:border-zinc-700 dark:bg-zinc-800/40">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400">Category</div>
+                                        <div class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $categoryTrendStats['category'] }}</div>
+                                        @if(!empty($categoryTrendStats['rank']))
+                                            <div class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Rank: #{{ $categoryTrendStats['rank'] }} (by turnover)</div>
+                                        @endif
+                                    </div>
+
+                                    <div class="text-right">
+                                        <div class="text-xs text-zinc-500 dark:text-zinc-400">This month turnover</div>
+                                        <div class="font-semibold text-zinc-900 dark:text-zinc-100">₱{{ number_format($categoryTrendStats['current_turnover'], 2) }}</div>
+                                        <div class="mt-1 text-xs">
+                                            @if($categoryTrendStats['trend_direction'] === 'up')
+                                                <span class="text-emerald-600 dark:text-emerald-400">▲ {{ $categoryTrendStats['trend_percentage'] }}%</span>
+                                            @elseif($categoryTrendStats['trend_direction'] === 'down')
+                                                <span class="text-red-600 dark:text-red-400">▼ {{ abs($categoryTrendStats['trend_percentage'] ?? 0) }}%</span>
+                                            @elseif($categoryTrendStats['trend_direction'] === 'new')
+                                                <span class="text-sky-600 dark:text-sky-400">New</span>
+                                            @else
+                                                <span class="text-zinc-500">--</span>
+                                            @endif
+                                            <span class="text-zinc-500 dark:text-zinc-400">vs last month</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 grid gap-2 sm:grid-cols-2 text-xs text-zinc-600 dark:text-zinc-300">
+                                    <div>Previous month turnover: <span class="font-medium">₱{{ number_format($categoryTrendStats['previous_turnover'], 2) }}</span></div>
+                                    <div>All-time category turnover: <span class="font-medium">₱{{ number_format($categoryTrendStats['total_turnover'], 2) }}</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                     <div>
                         <h3 class="mb-4 font-semibold text-zinc-800 dark:text-zinc-100">Supplier Details</h3>

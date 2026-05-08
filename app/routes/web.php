@@ -69,6 +69,10 @@ Route::get('/inventory-manager/inventory/{item}', [InventoryController::class, '
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory.show');
 
+Route::get('/inventory-manager/inventory/{item}/download', [InventoryController::class, 'downloadItem'])
+    ->middleware(['auth', 'role:inventory_manager'])
+    ->name('inventory_manager.inventory.item.download');
+
 Route::get('/inventory-manager/suppliers', [SupplierController::class, 'index'])
     ->middleware(['auth', 'role:inventory_manager'])
     ->name('inventory_manager.suppliers');
